@@ -1,100 +1,199 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/boxes.svg" width="80" height="80" alt="Stockify Logo" />
 
-## Stockify
+  # 📦 Stockify
+  
+  **Modern Intelligent Inventory, Warehouse & Commerce Management System**  
+  *Powered by Laravel 11/12, Inertia.js v3, React 19, TypeScript & Tailwind CSS v4*
 
-Stockify is a Laravel inventory application with role-specific workspaces for Admin, Manajer Gudang, and Staff Gudang. Admins manage products, categories, reusable product-attribute definitions, suppliers, accounts, access roles, and application settings. Managers create products, record stock movements, monitor balances, and perform stock counts. Warehouse staff record incoming and outgoing transactions, explicitly mark receipts as inspected or issues as prepared, then confirm the transaction; only confirmation changes the stock balance. Staff can also record stock counts that immediately adjust the stock balance. Admins and Managers can review stock, transaction, and user activity reports.
+  <p align="center">
+    <a href="#-fitur-utama">Fitur</a> •
+    <a href="#-demo-akun">Akun Demo</a> •
+    <a href="#-teknologi">Teknologi</a> •
+    <a href="#-instalasi--menjalankan">Instalasi</a> •
+    <a href="#-struktur-direktori">Struktur</a> •
+    <a href="#-lisensi">Lisensi</a>
+  </p>
 
-### Local development
+  <p align="center">
+    <img src="https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel" />
+    <img src="https://img.shields.io/badge/Inertia.js-9553E9?style=for-the-badge&logo=inertia&logoColor=white" alt="Inertia.js" />
+    <img src="https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19" />
+    <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License" />
+  </p>
 
-1. Install PHP/Composer and Node.js dependencies with `composer install` and `npm install`.
-2. Configure `.env` with your database connection, then run `php artisan migrate --seed`.
-3. In one terminal run `npm run dev`; in another run `php artisan serve`.
-4. Open the URL printed by Laravel (normally `http://127.0.0.1:8000`). Keep both commands running during development.
-5. If using an uploaded application logo, run `php artisan storage:link` once.
+</div>
 
-The development seeder creates demo accounts: `admin@stockify.test` / `Admin123`, `manager@stockify.test` / `Manager1`, and `staff@stockify.test` / `Staff123`. Do not use these demo credentials in production. To keep Laravel Debugbar out of the page, set `DEBUGBAR_ENABLED=false` in `.env` and restart the Laravel server.
+---
 
-For production assets, run `npm run build`.
+## 🌟 Tentang Stockify
 
-### Product CSV import and export
+**Stockify** adalah platform manajemen persediaan barang (inventory) dan transaksi gudang terpadu yang menjembatani operasional internal gudang dengan kebutuhan belanja pelanggan (*customer*). 
 
-Only Admins can download the CSV template, import products, or export the product catalog. The import accepts up to 1,000 rows in UTF-8 CSV (maximum 2 MB). Required columns are `name`, `sku`, `category`, `supplier`, `purchase_price`, `selling_price`, and `minimum_stock`. Optional columns are `description`, `initial_stock` (defaults to zero), and `attributes`.
+Dibangun dengan arsitektur modern berbasis **Single Page Application (SPA)** menggunakan **Inertia.js** dan **React 19**, Stockify menawarkan performa cepat tanpa reload halaman, visual antarmuka elegan bertema *Unified Royal Blue* (`#3B5BFD`), dan kontrol hak akses multi-peran (*Role-Based Access Control*).
 
-Category and supplier values must match existing names (case-insensitive). Attributes use `Name:Value;Name:Value`, for example `Color:Black;Size:M`. Prices use plain decimal numbers without currency symbols or thousands separators. Each valid row is imported independently; invalid rows are reported by CSV line number. A positive initial stock is recorded as a confirmed incoming stock transaction so the stock ledger remains auditable. Exported CSVs contain the same columns, with `initial_stock` populated from the current calculated balance.
+---
 
-Application workflows are organized through services and repositories: product management uses `ProductService`/`ProductRepository`, stock movements use `StockTransactionService`/`StockTransactionRepository`, dashboards and reports use dedicated query repositories, and category, supplier, user, settings, and activity persistence are likewise handled behind repositories.
+## ✨ Fitur Utama
 
-The authenticated Stockify layout adapts the Flowbite Admin Dashboard shell (fixed top navigation, role-aware sidebar, and responsive content area); demo-only navigation and placeholder widgets from the template are not exposed as Stockify features. Flowbite is initialized from the JavaScript entry point used by this layout.
+### 👑 1. Portal Admin & Manajer Gudang
+- **Executive Analytics Dashboard**: Metrik perputaran stok (*turnover rate*), total nilai aset gudang, SKU hampir habis (*low-stock alerts*), dan tren pesanan.
+- **Order & Transaction Review**: Pemantauan pesanan pelanggan secara langsung dan riwayat transaksi barang masuk/keluar (*Stock In / Stock Out*).
+- **Refund Management**: Verifikasi permohonan pengembalian dana (*refund*) dari pelanggan dengan opsi persetujuan (*Approve*) atau penolakan (*Reject*) disertai alasan.
+- **Supplier & Category Management**: Manajemen pemasok mitra dan kategori produk.
 
-Role boundaries combine the "Role" responsibilities with the detailed workflows: Admin manages all application data and settings; Managers create products, record stock transactions, view reports, and perform stock counts; warehouse Staff record and confirm incoming/outgoing work, can create an unregistered product during receipt, and may record stock counts. Only Admins can edit or delete products, define reusable product attributes, manage users, import/export products, or change application settings. Managers and Staff choose from the definitions when entering product attributes.
+### 📦 2. Portal Staff Gudang (Petugas)
+- **Task Center**: Pusat tugas harian petugas gudang untuk memproses verifikasi barang masuk dan pengeluaran pesanan.
+- **Inventory Control**: Pembaruan stok instan saat barang diterima dari supplier atau saat dipersiapkan untuk pengiriman.
+- **Product Management**: Pengelolaan data produk dan varian atribut barang.
 
-Product images can be uploaded as JPG, PNG, or WebP files (up to 2 MB) and are stored on Laravel's public disk. Incoming stock receipts can select the supplier for that specific transaction; when none is selected, the product's assigned supplier is recorded.
+### 🛒 3. Portal Customer (Katalog & Belanja)
+- **Direct Catalog Browsing**: Penjelajahan katalog produk responsif dengan filter pencarian, indikator ketersediaan stok, dan foto produk.
+- **Automated Stock Deduction**: Stok barang di gudang otomatis berkurang secara konsisten setiap kali pesanan berhasil dilakukan.
+- **Interactive Dummy Payment Simulation**: Modal simulasi pembayaran (Virtual Account, QRIS, Transfer Bank) yang aman untuk pengujian alur *checkout* tanpa gateway finansial riil.
+- **Order Tracking & History**: Pelacakan status pesanan pelanggan (*pending, diproses, dikirim, selesai*).
+- **Ratings & Feedback**: Pelanggan dapat memberikan ulasan bintang (1–5) dan komentar ulasan produk setelah transaksi.
+- **Refund Request**: Pengajuan komplain/refund barang rusak atau tidak sesuai dengan input bukti dan alasan.
 
-The five sample products use demo images in `storage/app/public/products`. Run `php artisan storage:link` to make uploaded and bundled public-disk images available to the browser.
+### 🔐 4. Autentikasi & Keamanan (RBAC)
+- **Restricted Public Registration**: Formulir registrasi publik dikunci otomatis khusus untuk pendaftaran role **Customer**, mencegah eskalasi hak akses internal.
+- **Fortify & Middleware Guard**: Proteksi rute tingkat controller dan middleware berbasis peran pengguna (`admin`, `manajer_gudang`, `staff_gudang`, `customer`).
 
-Admins can update the application name, short description, and logo from Settings. Admins and Managers can review activity reports, while Staff can access stock and transaction tasks.
+---
 
-## About Laravel
+## 🛠️ Teknologi yang Digunakan
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Komponen | Teknologi | Keterangan |
+| :--- | :--- | :--- |
+| **Backend Framework** | [Laravel 11/12](https://laravel.com) | PHP 8.3+, Eloquent ORM, Fortify Auth |
+| **Frontend Adapter** | [Inertia.js v3](https://inertiajs.com) | Monolithic SPA bridge antara Laravel & React |
+| **Frontend Library** | [React 19](https://react.dev) | Komponen UI reaktif dengan TypeScript |
+| **Bahasa Pemrograman**| PHP 8.3 & TypeScript | Type-safe front-to-back |
+| **Styling & Icons** | [Tailwind CSS v4](https://tailwindcss.com) & [Lucide React](https://lucide.dev) | Desain modern, responsive, dan konsisten |
+| **Bundler & Tooling** | [Vite](https://vitejs.dev) | Hot Module Replacement (HMR) super cepat |
+| **Database** | SQLite / MySQL / PostgreSQL | Didukung penuh via Laravel Migrations |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 👥 Demo Akun Bawaan
 
-## Learning Laravel
+Database seeder telah dilengkapi dengan akun pengujian untuk setiap tingkatan peran.  
+*Semua akun menggunakan kata sandi:* `password`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Peran (Role) | Email | Akses Halaman Utama |
+| :--- | :--- | :--- |
+| **Admin** | `admin@stockify.test` | Full Dashboard, Analytics, Refund & Order Approvals |
+| **Manajer Gudang** | `manajer@stockify.test` | Dashboard Operasional & Laporan Stok |
+| **Staff Gudang** | `staff@stockify.test` | Task Center, Verifikasi Barang Masuk/Keluar |
+| **Customer** | `customer@stockify.test` | Langsung ke Katalog Belanja, Pesanan, Feedback & Refund |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🚀 Panduan Instalasi & Menjalankan
 
-## Laravel Sponsors
+Ikuti langkah-langkah berikut untuk menjalankan Stockify di komputer lokal:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### 1. Prasyarat Sistem
+- **PHP** >= 8.3 (dengan ekstensi `pdo`, `mbstring`, `openssl`, `curl`)
+- **Composer** >= 2.x
+- **Node.js** >= 20.x & **npm**
 
-### Premium Partners
+### 2. Kloning Repositori
+```bash
+git clone https://github.com/Fino905/stockify.git
+cd stockify
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### 3. Instal Dependensi Backend & Frontend
+```bash
+# Instal dependensi PHP
+composer install
 
-## Contributing
+# Instal dependensi JavaScript/React
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Konfigurasi Lingkungan (`.env`)
+Salin file konfigurasi environment dan buat encryption key aplikasi:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Code of Conduct
+> **Catatan Database**: Jika menggunakan SQLite, pastikan file `database/database.sqlite` tersedia:
+> ```bash
+> touch database/database.sqlite
+> ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5. Jalankan Migrasi & Seeder Data
+Jalankan migrasi database beserta data awal (*dummy products, categories, stock, orders, dan akun demo*):
+```bash
+php artisan migrate --seed --seeder=StockifySeeder
+```
 
-## Security Vulnerabilities
+### 6. Jalankan Server Pengembangan
+Jalankan backend Laravel dan frontend Vite secara bersamaan:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# Terminal 1 - Backend Laravel
+php artisan serve
 
-## License
+# Terminal 2 - Frontend Vite
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Buka peramban Anda di [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+---
+
+## 📁 Struktur Direktori Utama
+
+```plaintext
+stockify/
+├── app/
+│   ├── Actions/Fortify/           # Aksi registrasi & autentikasi pengguna
+│   ├── Http/Controllers/          # Controller (DashboardController, CatalogController, dll.)
+│   ├── Models/                   # Model Eloquent (Product, Order, OrderFeedback, OrderRefund, dll.)
+│   └── Services/                 # Business logic terisolasi (DashboardService.php)
+├── database/
+│   ├── migrations/               # Skema tabel database
+│   └── seeders/                  # StockifySeeder dengan data simulasi lengkap
+├── resources/
+│   ├── css/                      # Konfigurasi Tailwind CSS v4
+│   └── js/
+│       ├── components/
+│       │   ├── dashboard/
+│       │   │   ├── admin/       # Modul Analytics & Overview Admin
+│       │   │   ├── staff/       # Modul Task Center & Gudang Staff
+│       │   │   └── customer/    # Modul Katalog, Pesanan & Refund Pelanggan
+│       │   └── flowbite/        # Navbar & Sidebar responsif
+│       ├── layouts/              # AppLayout & AuthLayout
+│       └── pages/                # Halaman Inertia (dashboard.tsx, welcome.tsx, auth/)
+└── routes/
+    └── web.php                   # Routing web & proteksi middleware
+```
+
+---
+
+## 🤝 Kontribusi
+
+Kontribusi selalu diterima dengan tangan terbuka!
+1. Fork repositori ini
+2. Buat branch fitur baru (`git checkout -b fitur/FiturKeren`)
+3. Commit perubahan Anda (`git commit -m 'Menambahkan fitur keren'`)
+4. Push ke branch Anda (`git push origin fitur/FiturKeren`)
+5. Ajukan **Pull Request**
+
+---
+
+## 📄 Lisensi
+
+Projek ini didistribusikan di bawah lisensi open-source **[MIT License](LICENSE)**.
+
+<div align="center">
+  <sub>Dibangun dengan dedikasi untuk efisiensi manajemen persediaan dan kepuasan pelanggan.</sub>
+</div>
