@@ -2,6 +2,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
+import { initScrollReveal } from '@/lib/scroll-reveal';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -15,6 +16,7 @@ void createInertiaApp({
             case name === 'welcome':
             case name === 'dashboard':
             case name === 'auth/login':
+            case name === 'auth/register':
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
@@ -41,3 +43,6 @@ void createInertiaApp({
 
 // This will set light / dark mode on load...
 initializeTheme();
+
+// Initialize scroll reveal animations for landing page & dashboard
+initScrollReveal();

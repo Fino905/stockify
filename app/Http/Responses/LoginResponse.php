@@ -10,8 +10,12 @@ class LoginResponse implements LoginResponseContract
 {
     public function toResponse($request): Response
     {
+        if ($request->hasSession()) {
+            $request->session()->forget('url.intended');
+        }
+
         return $request->wantsJson()
             ? new JsonResponse(['two_factor' => false], 200)
-            : redirect()->intended('/dashboard');
+            : redirect()->to('/dashboard');
     }
 }

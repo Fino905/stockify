@@ -13,7 +13,8 @@ class SupplierRepository implements SupplierRepositoryInterface
      */
     public function getAllWithProductsCount(): Collection
     {
-        return Supplier::withCount('products')
+        return Supplier::with('category')
+            ->withCount('products')
             ->orderBy('name')
             ->get();
     }

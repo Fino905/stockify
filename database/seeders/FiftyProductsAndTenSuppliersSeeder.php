@@ -1,0 +1,786 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductAttribute;
+use App\Models\StockTransaction;
+use App\Models\Supplier;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class FiftyProductsAndTenSuppliersSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // 1. Pastikan seluruh 7 Kategori Inti Tersedia
+        $categories = [
+            'Bahan Baku & Material' => 'Logam, besi, plat, pipa baja, kayu, dan material mentah industri',
+            'Perkakas & Baut' => 'Baut, mur, sekrup, fastener, paku, dan perkakas sambungan',
+            'Elektronik & Kelistrikan' => 'Kabel, trafo, circuit breaker, saklar, panel listrik, dan komponen elektronik',
+            'Perlengkapan K3' => 'Helm safety, sarung tangan proyek, rompi, dan kacamata pelindung',
+            'Peralatan & Perkakas' => 'Peralatan teknik, pertukangan, mesin gerinda, obeng, tang, palu, bor, dan perkakas instalasi',
+            'Kendaraan & Otomotif' => 'Kendaraan, sepeda motor, mobil, ban, oli mesin, aki, spare part, dan onderdil otomotif',
+            'Sayur & Bahan Pangan' => 'Sayuran segar, sayur mayur, buah-buahan, rempah, wortel, kubis, cabai, dan bahan pangan',
+        ];
+
+        $categoryModels = [];
+        foreach ($categories as $name => $desc) {
+            $categoryModels[$name] = Category::firstOrCreate(
+                ['name' => $name],
+                ['description' => $desc]
+            );
+        }
+
+        // 2. Tambahkan 10 Supplier Baru yang Berbeda
+        $suppliersData = [
+            [
+                'name' => 'PT Agronusa Pangan Lestari',
+                'address' => 'Jl. Raya Lembang No. 128, Bandung Barat, Jawa Barat',
+                'phone' => '022-2789123',
+                'email' => 'supplier@agronusa-pangan.co.id',
+            ],
+            [
+                'name' => 'PT Nusantara Sparepart Mandiri',
+                'address' => 'Kawasan Industri Sunter Blok B-14, Jakarta Utara',
+                'phone' => '021-6530987',
+                'email' => 'contact@nusantara-sparepart.co.id',
+            ],
+            [
+                'name' => 'CV Sumber Makmur Baja',
+                'address' => 'Kawasan Industri Krakatau Steel Kav. 42, Cilegon, Banten',
+                'phone' => '0254-398765',
+                'email' => 'sales@sumbermakmurbaja.com',
+            ],
+            [
+                'name' => 'PT Garda Safety Indonesia',
+                'address' => 'Rungkut Industri Raya No. 56, Surabaya, Jawa Timur',
+                'phone' => '031-8432109',
+                'email' => 'info@gardasafety.co.id',
+            ],
+            [
+                'name' => 'CV Mega Elektro Prima',
+                'address' => 'Harco Glodok Blok A No. 22-25, Mangga Besar, Jakarta Barat',
+                'phone' => '021-6298710',
+                'email' => 'distributor@megaelektro.com',
+            ],
+            [
+                'name' => 'PT Tani Sejahtera Mandiri',
+                'address' => 'Jl. Raya Oro-Oro Ombo No. 77, Kota Batu, Jawa Timur',
+                'phone' => '0341-591234',
+                'email' => 'order@tanisejahtera.co.id',
+            ],
+            [
+                'name' => 'CV Presisi Perkakas Teknik',
+                'address' => 'Jl. Kaligawe Raya KM 5, Genuk, Semarang, Jawa Tengah',
+                'phone' => '024-6582319',
+                'email' => 'perkakas@presisiteknik.com',
+            ],
+            [
+                'name' => 'PT Fastener Sentra Utama',
+                'address' => 'Kawasan Industri MM2100 Blok C-09, Cikarang Barat, Bekasi',
+                'phone' => '021-8980123',
+                'email' => 'sales@fastenersentra.co.id',
+            ],
+            [
+                'name' => 'PT Indo Oli Lubrikasi',
+                'address' => 'Jl. MT Haryono No. 102, Lomanis, Cilacap, Jawa Tengah',
+                'phone' => '0282-541298',
+                'email' => 'supply@indoolilubrikasi.co.id',
+            ],
+            [
+                'name' => 'CV Cipta Logam Abadi',
+                'address' => 'Kompleks Pergudangan SIER Blok E-8, Rungkut, Surabaya',
+                'phone' => '031-8706543',
+                'email' => 'marketing@ciptalogam.co.id',
+            ],
+        ];
+
+        $supplierModels = [];
+        foreach ($suppliersData as $sup) {
+            $supplierModels[$sup['name']] = Supplier::firstOrCreate(
+                ['name' => $sup['name']],
+                [
+                    'address' => $sup['address'],
+                    'phone' => $sup['phone'],
+                    'email' => $sup['email'],
+                ]
+            );
+        }
+
+        // Staff user untuk pencatatan transaksi masuk (initial stock)
+        $staffUser = User::where('role', 'staff_gudang')->first()
+            ?? User::where('email', 'staff@stockify.test')->first()
+            ?? User::first();
+
+        // 3. Tambahkan 50 Produk Berbagai Kategori Berbeda
+        $productsData = [
+            // --- KATEGORI 1: Sayur & Bahan Pangan (8 Produk) ---
+            [
+                'sku' => 'PRD-SAYUR-001',
+                'name' => 'Wortel Berastagi Super Segar (1 Kg)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Agronusa Pangan Lestari',
+                'description' => 'Wortel oranye segar pilihan langsung dari petani Berastagi, renyah, manis alami, dan kaya vitamin A.',
+                'purchase_price' => 12000,
+                'selling_price' => 18000,
+                'minimum_stock' => 20,
+                'initial_stock' => 150,
+                'attributes' => ['Kemasan' => 'Kantong 1 Kg', 'Asal' => 'Berastagi, Sumatera Utara'],
+            ],
+            [
+                'sku' => 'PRD-SAYUR-002',
+                'name' => 'Tomat Cherry Organik Hidroponik (500g)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Agronusa Pangan Lestari',
+                'description' => 'Tomat cherry merah matang segar dari perkebunan hidroponik tanpa pestisida sintetis.',
+                'purchase_price' => 15000,
+                'selling_price' => 24000,
+                'minimum_stock' => 15,
+                'initial_stock' => 100,
+                'attributes' => ['Kemasan' => 'Mika 500 Gram', 'Tipe' => 'Organik Hidroponik'],
+            ],
+            [
+                'sku' => 'PRD-SAYUR-003',
+                'name' => 'Kubis Hijau Segar Dataran Tinggi (1 Kg)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Tani Sejahtera Mandiri',
+                'description' => 'Sayur kol kubis hijau segar kepala padat dari dataran tinggi Malang Jawa Timur.',
+                'purchase_price' => 8000,
+                'selling_price' => 13000,
+                'minimum_stock' => 25,
+                'initial_stock' => 180,
+                'attributes' => ['Kemasan' => 'Per Kilogram', 'Kondisi' => 'Segar Baru Panen'],
+            ],
+            [
+                'sku' => 'PRD-SAYUR-004',
+                'name' => 'Brokoli Hijau Segar Premium (500g)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Tani Sejahtera Mandiri',
+                'description' => 'Brokoli hijau segar bunga padat kualitas Grade A kaya serat dan antioksidan.',
+                'purchase_price' => 16000,
+                'selling_price' => 25000,
+                'minimum_stock' => 15,
+                'initial_stock' => 90,
+                'attributes' => ['Kemasan' => 'Wrap 500 Gram', 'Grade' => 'Grade A Super'],
+            ],
+            [
+                'sku' => 'PRD-SAYUR-005',
+                'name' => 'Kentang Granola Dieng Grade A (1 Kg)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Tani Sejahtera Mandiri',
+                'description' => 'Kentang kuning varietas granola dari lereng pegunungan Dieng, kulit bersih dan daging pulen.',
+                'purchase_price' => 14000,
+                'selling_price' => 21000,
+                'minimum_stock' => 30,
+                'initial_stock' => 200,
+                'attributes' => ['Kemasan' => 'Karung Jaring 1 Kg', 'Varietas' => 'Granola Dieng'],
+            ],
+            [
+                'sku' => 'PRD-SAYUR-006',
+                'name' => 'Bawang Merah Brebes Super Kering (1 Kg)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Agronusa Pangan Lestari',
+                'description' => 'Bawang merah asli Brebes umbi padat kemerahan, aroma tajam menyengat dan tahan simpan lama.',
+                'purchase_price' => 28000,
+                'selling_price' => 38000,
+                'minimum_stock' => 20,
+                'initial_stock' => 120,
+                'attributes' => ['Kemasan' => 'Jaring 1 Kg', 'Asal' => 'Brebes Jawa Tengah'],
+            ],
+            [
+                'sku' => 'PRD-SAYUR-007',
+                'name' => 'Cabai Rawit Merah Segar (500g)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Agronusa Pangan Lestari',
+                'description' => 'Cabe rawit merah pedas alami, petik segar tangkai hijau utuh tanpa layu.',
+                'purchase_price' => 25000,
+                'selling_price' => 35000,
+                'minimum_stock' => 15,
+                'initial_stock' => 80,
+                'attributes' => ['Kemasan' => 'Paket 500 Gram', 'Tingkat Kepedasan' => 'Tinggi'],
+            ],
+            [
+                'sku' => 'PRD-SAYUR-008',
+                'name' => 'Jagung Manis Pipil Segar (1 Kg)',
+                'category' => 'Sayur & Bahan Pangan',
+                'supplier' => 'PT Tani Sejahtera Mandiri',
+                'description' => 'Biji jagung manis kuning segar pilihan, dipipil higienis untuk kebutuhan dapur dan katering.',
+                'purchase_price' => 18000,
+                'selling_price' => 26000,
+                'minimum_stock' => 20,
+                'initial_stock' => 110,
+                'attributes' => ['Kemasan' => 'Vacuum Pack 1 Kg', 'Rasa' => 'Manis Alami'],
+            ],
+
+            // --- KATEGORI 2: Kendaraan & Otomotif (8 Produk) ---
+            [
+                'sku' => 'PRD-OTO-001',
+                'name' => 'Oli Mesin Sintetik 10W-40 4T 1 Liter',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Indo Oli Lubrikasi',
+                'description' => 'Pelumas mesin motor 4-tak teknologi sintetis dengan ester tahan panas dan melindungi gesekan piston.',
+                'purchase_price' => 48000,
+                'selling_price' => 65000,
+                'minimum_stock' => 25,
+                'initial_stock' => 140,
+                'attributes' => ['Volume' => '1 Liter', 'Viskositas' => 'SAE 10W-40 JASO MA2'],
+            ],
+            [
+                'sku' => 'PRD-OTO-002',
+                'name' => 'Aki Kering Bebas Perawatan 12V 5Ah Motor Matic',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Nusantara Sparepart Mandiri',
+                'description' => 'Aki motor matic/bebek sealed maintenance free (MF) daya starter responsif tahan goncangan.',
+                'purchase_price' => 165000,
+                'selling_price' => 225000,
+                'minimum_stock' => 10,
+                'initial_stock' => 60,
+                'attributes' => ['Tegangan' => '12 Volt', 'Kapasitas' => '5 Ampere-hour'],
+            ],
+            [
+                'sku' => 'PRD-OTO-003',
+                'name' => 'Ban Tubeless Motor Matic 90/90-14 Ring 14',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Nusantara Sparepart Mandiri',
+                'description' => 'Ban luar tubeless motor matic compound ganda dengan alur pembuangan air anti slip.',
+                'purchase_price' => 170000,
+                'selling_price' => 230000,
+                'minimum_stock' => 12,
+                'initial_stock' => 75,
+                'attributes' => ['Ukuran' => '90/90-14', 'Tipe' => 'Tubeless'],
+            ],
+            [
+                'sku' => 'PRD-OTO-004',
+                'name' => 'Kampas Rem Cakram Depan Motor Honda & Yamaha',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Nusantara Sparepart Mandiri',
+                'description' => 'Brake pad non-asbestos pengereman stabil suhu tinggi dan tidak merusak piringan cakram.',
+                'purchase_price' => 28000,
+                'selling_price' => 45000,
+                'minimum_stock' => 30,
+                'initial_stock' => 160,
+                'attributes' => ['Material' => 'Ceramic Non-Asbestos', 'Posisi' => 'Depan'],
+            ],
+            [
+                'sku' => 'PRD-OTO-005',
+                'name' => 'Busi Iridium Racing Performance CR7HIX',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Nusantara Sparepart Mandiri',
+                'description' => 'Busi elektroda iridium pengapian fokus presisi, akselerasi enteng dan hemat bahan bakar.',
+                'purchase_price' => 65000,
+                'selling_price' => 95000,
+                'minimum_stock' => 20,
+                'initial_stock' => 100,
+                'attributes' => ['Elektroda' => 'Iridium 0.6mm', 'Tipe' => 'Racing / Harian'],
+            ],
+            [
+                'sku' => 'PRD-OTO-006',
+                'name' => 'Rantai Roda Motor Heavy Duty 428H-110L Gold',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Nusantara Sparepart Mandiri',
+                'description' => 'Drive chain solid bush perlakuan panas khusus tahan tarikan beban berat dan gesekan tinggi.',
+                'purchase_price' => 75000,
+                'selling_price' => 115000,
+                'minimum_stock' => 15,
+                'initial_stock' => 80,
+                'attributes' => ['Tipe' => '428H Heavy Duty', 'Panjang' => '110 Links'],
+            ],
+            [
+                'sku' => 'PRD-OTO-007',
+                'name' => 'Lampu Bohlam Depan Motor Halogen 12V 35/35W',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Nusantara Sparepart Mandiri',
+                'description' => 'Bohlam lampu utama halogen sorot kuning tajam tembus kabut, hujan lebat, dan malam gelap.',
+                'purchase_price' => 18000,
+                'selling_price' => 30000,
+                'minimum_stock' => 25,
+                'initial_stock' => 130,
+                'attributes' => ['Daya' => '12V 35/35 Watt', 'Soket' => 'M5 / Kaki 1'],
+            ],
+            [
+                'sku' => 'PRD-OTO-008',
+                'name' => 'Shockbreaker Belakang Tabung 330mm Motor Matic',
+                'category' => 'Kendaraan & Otomotif',
+                'supplier' => 'PT Nusantara Sparepart Mandiri',
+                'description' => 'Peredam kejut suspensi belakang tabung gas adjustable preload kenyamanan berkendara harian.',
+                'purchase_price' => 220000,
+                'selling_price' => 310000,
+                'minimum_stock' => 8,
+                'initial_stock' => 40,
+                'attributes' => ['Tinggi' => '330 mm', 'Fitur' => 'Preload Spring Adjustment'],
+            ],
+
+            // --- KATEGORI 3: Peralatan & Perkakas (7 Produk) ---
+            [
+                'sku' => 'PRD-ALAT-001',
+                'name' => 'Mesin Bor Tangan Listrik Variable Speed 13mm',
+                'category' => 'Peralatan & Perkakas',
+                'supplier' => 'CV Presisi Perkakas Teknik',
+                'description' => 'Bor listrik impact drill 550 Watt dengan tombol putaran bolak balik dan pengatur kecepatan.',
+                'purchase_price' => 280000,
+                'selling_price' => 385000,
+                'minimum_stock' => 8,
+                'initial_stock' => 45,
+                'attributes' => ['Kapasitas Chuck' => '13 mm', 'Daya' => '550 Watt / 220V'],
+            ],
+            [
+                'sku' => 'PRD-ALAT-002',
+                'name' => 'Mesin Gerinda Tangan 4 Inch 750W Heavy Duty',
+                'category' => 'Peralatan & Perkakas',
+                'supplier' => 'CV Presisi Perkakas Teknik',
+                'description' => 'Angle grinder kecepatan 11000 RPM bodi ramping nyaman digenggam untuk potong dan poles besi.',
+                'purchase_price' => 260000,
+                'selling_price' => 360000,
+                'minimum_stock' => 10,
+                'initial_stock' => 50,
+                'attributes' => ['Diameter Mata' => '4 Inch (100mm)', 'Kecepatan' => '11.000 RPM'],
+            ],
+            [
+                'sku' => 'PRD-ALAT-003',
+                'name' => 'Kunci Inggris Heavy Duty Adjustable Wrench 12 Inch',
+                'category' => 'Peralatan & Perkakas',
+                'supplier' => 'CV Presisi Perkakas Teknik',
+                'description' => 'Kunci inggris baja tempa krom vanadium presisi tinggi bukaan rahang lebar dengan skala laser.',
+                'purchase_price' => 75000,
+                'selling_price' => 115000,
+                'minimum_stock' => 15,
+                'initial_stock' => 70,
+                'attributes' => ['Panjang' => '12 Inch (300mm)', 'Material' => 'Chrome Vanadium'],
+            ],
+            [
+                'sku' => 'PRD-ALAT-004',
+                'name' => 'Set Kunci Sok 24 Pcs Chrome Vanadium 1/2 Inch Box Besi',
+                'category' => 'Peralatan & Perkakas',
+                'supplier' => 'CV Presisi Perkakas Teknik',
+                'description' => 'Tool kit soket komplit ratchet handle gagang geser sambungan ekstensi dalam koper besi kokoh.',
+                'purchase_price' => 320000,
+                'selling_price' => 450000,
+                'minimum_stock' => 6,
+                'initial_stock' => 35,
+                'attributes' => ['Jumlah Item' => '24 Pcs', 'Ukuran Drive' => '1/2 Inch DR'],
+            ],
+            [
+                'sku' => 'PRD-ALAT-005',
+                'name' => 'Tang Kombinasi Ergonomis 8 Inch TPR Grip',
+                'category' => 'Peralatan & Perkakas',
+                'supplier' => 'CV Presisi Perkakas Teknik',
+                'description' => 'Tang potong jepit serbaguna gagang karet TPR insulasi anti slip standar perkakas industri.',
+                'purchase_price' => 35000,
+                'selling_price' => 55000,
+                'minimum_stock' => 20,
+                'initial_stock' => 110,
+                'attributes' => ['Panjang' => '8 Inch (200mm)', 'Fungsi' => 'Potong & Jepit Kawat'],
+            ],
+            [
+                'sku' => 'PRD-ALAT-006',
+                'name' => 'Palu Kambing Baja Tempa Claw Hammer 16 Oz Fiber Handle',
+                'category' => 'Peralatan & Perkakas',
+                'supplier' => 'CV Presisi Perkakas Teknik',
+                'description' => 'Palu pencabut paku gagang fiberglass anti getar kepala baja karbon keras lapis anti karat.',
+                'purchase_price' => 45000,
+                'selling_price' => 70000,
+                'minimum_stock' => 15,
+                'initial_stock' => 85,
+                'attributes' => ['Berat Kepala' => '16 Oz (450g)', 'Gagang' => 'Fiberglass Rubber Grip'],
+            ],
+            [
+                'sku' => 'PRD-ALAT-007',
+                'name' => 'Meteran Baja Roll Lock 7.5 Meter Auto Stop',
+                'category' => 'Peralatan & Perkakas',
+                'supplier' => 'CV Presisi Perkakas Teknik',
+                'description' => 'Pita ukur meteran gulung plat baja lentur lapis nilon tahan gores dengan tombol auto lock.',
+                'purchase_price' => 30000,
+                'selling_price' => 48000,
+                'minimum_stock' => 20,
+                'initial_stock' => 120,
+                'attributes' => ['Panjang Pita' => '7.5 Meter', 'Lebar Pita' => '25 mm'],
+            ],
+
+            // --- KATEGORI 4: Perkakas & Baut (7 Produk) ---
+            [
+                'sku' => 'PRD-BAUT-001',
+                'name' => 'Baut Mur Baja Hitam Hex Grade 8.8 M10 x 50mm (Pack 50)',
+                'category' => 'Perkakas & Baut',
+                'supplier' => 'PT Fastener Sentra Utama',
+                'description' => 'Baut kepala segi enam baja tensile tinggi grade 8.8 komplit mur untuk konstruksi rangka dan mesin.',
+                'purchase_price' => 65000,
+                'selling_price' => 95000,
+                'minimum_stock' => 20,
+                'initial_stock' => 140,
+                'attributes' => ['Diameter' => 'M10 (10mm)', 'Panjang' => '50 mm', 'Grade' => '8.8 High Tensile'],
+            ],
+            [
+                'sku' => 'PRD-BAUT-002',
+                'name' => 'Sekrup Kayu Tapping Kepala Rata 4 x 30mm (Kotak 200)',
+                'category' => 'Perkakas & Baut',
+                'supplier' => 'PT Fastener Sentra Utama',
+                'description' => 'Sekrup kayu dan gypsum ulir tajam galvanis anti karat untuk perakitan mebel dan plafon.',
+                'purchase_price' => 32000,
+                'selling_price' => 50000,
+                'minimum_stock' => 25,
+                'initial_stock' => 150,
+                'attributes' => ['Ukuran' => '#8 (4.2mm) x 30mm', 'Kepala' => 'Countersunk Flat Head'],
+            ],
+            [
+                'sku' => 'PRD-BAUT-003',
+                'name' => 'Dynabolt Selongsong Baut Angkur M12 x 100mm (Pack 20)',
+                'category' => 'Perkakas & Baut',
+                'supplier' => 'PT Fastener Sentra Utama',
+                'description' => 'Baut tanam ekspansi beton selongsong plat baja kuat tahan beban tarikan konstruksi berat.',
+                'purchase_price' => 55000,
+                'selling_price' => 80000,
+                'minimum_stock' => 15,
+                'initial_stock' => 90,
+                'attributes' => ['Ukuran' => 'M12 x 100 mm', 'Material' => 'Carbon Steel Yellow Zinc'],
+            ],
+            [
+                'sku' => 'PRD-BAUT-004',
+                'name' => 'Paku Rivet Blind Rivet Aluminium 4mm x 12mm (Kotak 500)',
+                'category' => 'Perkakas & Baut',
+                'supplier' => 'PT Fastener Sentra Utama',
+                'description' => 'Paku keling aluminium mandrel baja untuk penyambungan plat seng, talang, dan hollow galvalum.',
+                'purchase_price' => 40000,
+                'selling_price' => 62000,
+                'minimum_stock' => 20,
+                'initial_stock' => 110,
+                'attributes' => ['Ukuran' => '4.0 mm x 12 mm', 'Isi' => '500 Pcs per Kotak'],
+            ],
+            [
+                'sku' => 'PRD-BAUT-005',
+                'name' => 'Mur Kupu-kupu Wing Nut Stainless Steel M8 (Pack 50)',
+                'category' => 'Perkakas & Baut',
+                'supplier' => 'PT Fastener Sentra Utama',
+                'description' => 'Mur kuping stainless 304 mudah dipasang dan dikencangkan dengan jari tanpa membutuhkan kunci pas.',
+                'purchase_price' => 45000,
+                'selling_price' => 68000,
+                'minimum_stock' => 15,
+                'initial_stock' => 80,
+                'attributes' => ['Ulir' => 'M8 x 1.25', 'Material' => 'Stainless Steel SUS 304'],
+            ],
+            [
+                'sku' => 'PRD-BAUT-006',
+                'name' => 'Baut Roofing Hex Washer Seal Karet 12 x 50mm (Pack 100)',
+                'category' => 'Perkakas & Baut',
+                'supplier' => 'PT Fastener Sentra Utama',
+                'description' => 'Baut atap spandek galvalum self drilling mata obeng plus ring washer karet EPDM anti bocor.',
+                'purchase_price' => 58000,
+                'selling_price' => 85000,
+                'minimum_stock' => 20,
+                'initial_stock' => 130,
+                'attributes' => ['Ukuran' => '#12 x 50 mm (2 Inch)', 'Fitur' => 'Ring EPDM Rubber Washer'],
+            ],
+            [
+                'sku' => 'PRD-BAUT-007',
+                'name' => 'Mur Pengunci Nylon Insert Lock Nut M10 (Pack 50)',
+                'category' => 'Perkakas & Baut',
+                'supplier' => 'PT Fastener Sentra Utama',
+                'description' => 'Mur pengunci dengan cincin nilon tahan getaran mencegah baut terlepas pada mesin dan kendaraan.',
+                'purchase_price' => 38000,
+                'selling_price' => 58000,
+                'minimum_stock' => 20,
+                'initial_stock' => 100,
+                'attributes' => ['Ulir' => 'M10 x 1.50', 'Tipe' => 'Nylon Lock Nut'],
+            ],
+
+            // --- KATEGORI 5: Elektronik & Kelistrikan (7 Produk) ---
+            [
+                'sku' => 'PRD-ELK-001',
+                'name' => 'Kabel Listrik NYA 1x2.5mm Tembaga Tunggal 100m Roll',
+                'category' => 'Elektronik & Kelistrikan',
+                'supplier' => 'CV Mega Elektro Prima',
+                'description' => 'Kabel instalasi rumah pipa kawat tembaga murni standar SNI LMK isolasi PVC tahan panas.',
+                'purchase_price' => 290000,
+                'selling_price' => 380000,
+                'minimum_stock' => 10,
+                'initial_stock' => 55,
+                'attributes' => ['Penampang' => '1 x 2.5 mm2', 'Panjang' => '100 Meter Roll'],
+            ],
+            [
+                'sku' => 'PRD-ELK-002',
+                'name' => 'Mini Circuit Breaker (MCB) 1 Phase 16A 4500A SNI',
+                'category' => 'Elektronik & Kelistrikan',
+                'supplier' => 'CV Mega Elektro Prima',
+                'description' => 'Pembatas daya dan proteksi hubung singkat arus pendek standar PLN untuk daya 3500VA.',
+                'purchase_price' => 42000,
+                'selling_price' => 65000,
+                'minimum_stock' => 20,
+                'initial_stock' => 120,
+                'attributes' => ['Rating Arus' => '16 Ampere', 'Breaking Capacity' => '4.5 kA'],
+            ],
+            [
+                'sku' => 'PRD-ELK-003',
+                'name' => 'Stop Kontak Outbow Arde 2 Lubang SNI Tembok',
+                'category' => 'Elektronik & Kelistrikan',
+                'supplier' => 'CV Mega Elektro Prima',
+                'description' => 'Stop kontak tempel luar dinding kuningan tahan panas anti percikan api dengan grounding arde.',
+                'purchase_price' => 18000,
+                'selling_price' => 28000,
+                'minimum_stock' => 25,
+                'initial_stock' => 140,
+                'attributes' => ['Jumlah Lubang' => '2 Lubang + Arde', 'Tipe Pemasangan' => 'Outbow (Tempel)'],
+            ],
+            [
+                'sku' => 'PRD-ELK-004',
+                'name' => 'Lampu Sorot LED Floodlight 100 Watt IP65 Waterproof',
+                'category' => 'Elektronik & Kelistrikan',
+                'supplier' => 'CV Mega Elektro Prima',
+                'description' => 'Lampu penerangan outdoor area parkir dan gudang tahan hujan bodi aluminium sirip pendingin.',
+                'purchase_price' => 125000,
+                'selling_price' => 180000,
+                'minimum_stock' => 8,
+                'initial_stock' => 50,
+                'attributes' => ['Daya' => '100 Watt', 'Proteksi' => 'IP65 Waterproof Outdoor'],
+            ],
+            [
+                'sku' => 'PRD-ELK-005',
+                'name' => 'Saklar Ganda Flush Mount Piano Series 2 Gang',
+                'category' => 'Elektronik & Kelistrikan',
+                'supplier' => 'CV Mega Elektro Prima',
+                'description' => 'Saklar lampu dobel tanam tembok desain modern minimalis kontak perak tahan hingga puluhan ribu klik.',
+                'purchase_price' => 22000,
+                'selling_price' => 35000,
+                'minimum_stock' => 20,
+                'initial_stock' => 130,
+                'attributes' => ['Tipe' => 'Inbow 2 Gang (Ganda)', 'Bahan' => 'Polycarbonate Flame Retardant'],
+            ],
+            [
+                'sku' => 'PRD-ELK-006',
+                'name' => 'Power Supply Switching 12V 30A DC Metal Case Fan',
+                'category' => 'Elektronik & Kelistrikan',
+                'supplier' => 'CV Mega Elektro Prima',
+                'description' => 'Trafo adaptor jaring input AC 220V output DC 12V kipas pendingin untuk CCTV dan LED strip industri.',
+                'purchase_price' => 110000,
+                'selling_price' => 165000,
+                'minimum_stock' => 10,
+                'initial_stock' => 60,
+                'attributes' => ['Output' => 'DC 12V 30A (360 Watt)', 'Fitur' => 'Smart Cooling Fan'],
+            ],
+            [
+                'sku' => 'PRD-ELK-007',
+                'name' => 'Kontaktor Magnetik 3 Phase 220V 25A LC1D25',
+                'category' => 'Elektronik & Kelistrikan',
+                'supplier' => 'CV Mega Elektro Prima',
+                'description' => 'Saklar magnetik relay kontaktor starter motor listrik 3 phase beban berat di panel distribusi industri.',
+                'purchase_price' => 140000,
+                'selling_price' => 205000,
+                'minimum_stock' => 6,
+                'initial_stock' => 40,
+                'attributes' => ['Tegangan Coil' => '220V AC', 'Kapasitas Arus' => '25 Ampere AC-3'],
+            ],
+
+            // --- KATEGORI 6: Perlengkapan K3 (7 Produk) ---
+            [
+                'sku' => 'PRD-K3-001',
+                'name' => 'Helm Safety Proyek Putih Putaran Fastrack SNI',
+                'category' => 'Perlengkapan K3',
+                'supplier' => 'PT Garda Safety Indonesia',
+                'description' => 'Helm proyek konstruksi bahan ABS tahan benturan suspensi putar fastrack tali dagu elastis.',
+                'purchase_price' => 45000,
+                'selling_price' => 68000,
+                'minimum_stock' => 20,
+                'initial_stock' => 110,
+                'attributes' => ['Warna' => 'Putih', 'Suspensi' => 'Rachet Fastrack Knob'],
+            ],
+            [
+                'sku' => 'PRD-K3-002',
+                'name' => 'Sepatu Safety Ujung Besi Kulit Asli S1P Low Cut',
+                'category' => 'Perlengkapan K3',
+                'supplier' => 'PT Garda Safety Indonesia',
+                'description' => 'Safety shoes kulit asli sol tebal anti paku steel toe cap tahan beban benturan hingga 200 Joule.',
+                'purchase_price' => 18000,
+                'selling_price' => 260000,
+                'minimum_stock' => 10,
+                'initial_stock' => 65,
+                'attributes' => ['Material' => 'Genuine Leather', 'Toe Cap' => 'Steel Toe 200J'],
+            ],
+            [
+                'sku' => 'PRD-K3-003',
+                'name' => 'Kacamata Safety Pelindung UV Anti Gores & Fog',
+                'category' => 'Perlengkapan K3',
+                'supplier' => 'PT Garda Safety Indonesia',
+                'description' => 'Kacamata pelindung mata gerinda debu kimia lensa polikarbonat bening frame fleksibel hidung empuk.',
+                'purchase_price' => 18000,
+                'selling_price' => 32000,
+                'minimum_stock' => 25,
+                'initial_stock' => 150,
+                'attributes' => ['Lensa' => 'Polycarbonate Clear UV400', 'Fitur' => 'Anti Scratch & Anti Fog'],
+            ],
+            [
+                'sku' => 'PRD-K3-004',
+                'name' => 'Rompi Jaring Proyek Fosfor Reflektor Hi-Vis Orange',
+                'category' => 'Perlengkapan K3',
+                'supplier' => 'PT Garda Safety Indonesia',
+                'description' => 'Rompi safety orange scotlight pita pemantul cahaya terang siang dan malam dengan ritsleting depan.',
+                'purchase_price' => 22000,
+                'selling_price' => 38000,
+                'minimum_stock' => 20,
+                'initial_stock' => 130,
+                'attributes' => ['Warna' => 'Fluorescent Orange', 'Reflektor' => 'High Visibility Scothlite'],
+            ],
+            [
+                'sku' => 'PRD-K3-005',
+                'name' => 'Sarung Tangan Kulit Las Heat Resistant 14 Inch',
+                'category' => 'Perlengkapan K3',
+                'supplier' => 'PT Garda Safety Indonesia',
+                'description' => 'Sarung tangan kulit split sapi tebal pelindung percikan api las dan panas suhu kerja tinggi.',
+                'purchase_price' => 42000,
+                'selling_price' => 65000,
+                'minimum_stock' => 15,
+                'initial_stock' => 90,
+                'attributes' => ['Panjang' => '14 Inch (35cm)', 'Material' => 'Cowhide Split Leather'],
+            ],
+            [
+                'sku' => 'PRD-K3-006',
+                'name' => 'Tabung APAR Dry Chemical Powder 3kg Komplit Breket',
+                'category' => 'Perlengkapan K3',
+                'supplier' => 'PT Garda Safety Indonesia',
+                'description' => 'Alat pemadam api ringan serbuk kimia kering kelas kebakaran ABC meteran tekanan aktif bergaransi.',
+                'purchase_price' => 195000,
+                'selling_price' => 285000,
+                'minimum_stock' => 6,
+                'initial_stock' => 35,
+                'attributes' => ['Kapasitas' => '3 Kilogram', 'Media' => 'Dry Chemical Powder ABC'],
+            ],
+            [
+                'sku' => 'PRD-K3-007',
+                'name' => 'Full Body Harness Double Big Hook Absorber K3',
+                'category' => 'Perlengkapan K3',
+                'supplier' => 'PT Garda Safety Indonesia',
+                'description' => 'Tali pengaman kerja di ketinggian sabuk webbing polyester kuat kait ganda baja tempa dan peredam kejut.',
+                'purchase_price' => 210000,
+                'selling_price' => 310000,
+                'minimum_stock' => 8,
+                'initial_stock' => 45,
+                'attributes' => ['Tipe' => 'Double Big Lanyard Hook', 'Standar' => 'EN 361 Certified'],
+            ],
+
+            // --- KATEGORI 7: Bahan Baku & Material (6 Produk) ---
+            [
+                'sku' => 'PRD-MAT-001',
+                'name' => 'Plat Besi Hitam Lembaran 3mm x 1.2m x 2.4m',
+                'category' => 'Bahan Baku & Material',
+                'supplier' => 'CV Sumber Makmur Baja',
+                'description' => 'Hot rolled steel plate lembaran baja karbon konstruksi jembatan, karoseri, dan fabrikasi mesin.',
+                'purchase_price' => 650000,
+                'selling_price' => 820000,
+                'minimum_stock' => 5,
+                'initial_stock' => 30,
+                'attributes' => ['Dimensi' => '3 mm x 1200 mm x 2400 mm', 'Material' => 'Carbon Steel SS400'],
+            ],
+            [
+                'sku' => 'PRD-MAT-002',
+                'name' => 'Pipa Besi Seamless Sch 40 Diameter 2 Inch 6m',
+                'category' => 'Bahan Baku & Material',
+                'supplier' => 'CV Sumber Makmur Baja',
+                'description' => 'Pipa baja hitam tanpa sambungan tahan tekanan uap, cairan kimia, dan instalasi pipa minyak.',
+                'purchase_price' => 420000,
+                'selling_price' => 560000,
+                'minimum_stock' => 6,
+                'initial_stock' => 25,
+                'attributes' => ['Diameter' => '2 Inch Nominal', 'Jadwal' => 'Schedule 40 (Sch 40)'],
+            ],
+            [
+                'sku' => 'PRD-MAT-003',
+                'name' => 'Besi Beton Ulir D16 Standar SNI Panjang 12 Meter',
+                'category' => 'Bahan Baku & Material',
+                'supplier' => 'CV Sumber Makmur Baja',
+                'description' => 'Besi tulangan beton sirip mutu BJTD 40 kokoh untuk pondasi struktur kolom gedung bertingkat.',
+                'purchase_price' => 175000,
+                'selling_price' => 220000,
+                'minimum_stock' => 20,
+                'initial_stock' => 100,
+                'attributes' => ['Diameter' => '16 mm Ulir (Deformed)', 'Panjang' => '12 Meter SNI'],
+            ],
+            [
+                'sku' => 'PRD-MAT-004',
+                'name' => 'Plat Stainless Steel SUS 304 Tebal 1.5mm 1x2m',
+                'category' => 'Bahan Baku & Material',
+                'supplier' => 'CV Cipta Logam Abadi',
+                'description' => 'Plat lembaran baja tahan karat grade food grade permukaan halus hairline finish untuk tangki dan kitchen set.',
+                'purchase_price' => 520000,
+                'selling_price' => 690000,
+                'minimum_stock' => 5,
+                'initial_stock' => 28,
+                'attributes' => ['Tebal' => '1.5 mm', 'Grade' => 'Stainless Steel SUS 304'],
+            ],
+            [
+                'sku' => 'PRD-MAT-005',
+                'name' => 'Pipa Hollow Galvanis Kotak 40x40 Tebal 1.8mm 6m',
+                'category' => 'Bahan Baku & Material',
+                'supplier' => 'CV Sumber Makmur Baja',
+                'description' => 'Besi hollow kotak lapisan galvanis anti karat untuk rangka kanopi, pagar teralis, dan partisi.',
+                'purchase_price' => 145000,
+                'selling_price' => 195000,
+                'minimum_stock' => 12,
+                'initial_stock' => 70,
+                'attributes' => ['Ukuran' => '40 mm x 40 mm', 'Tebal' => '1.8 mm x 6 Meter'],
+            ],
+            [
+                'sku' => 'PRD-MAT-006',
+                'name' => 'Kawat Las Listrik Elektroda E6013 2.6mm Dus 5kg',
+                'category' => 'Bahan Baku & Material',
+                'supplier' => 'CV Cipta Logam Abadi',
+                'description' => 'Kawat las busur baja lunak pengelasan mulus penetrasi stabil terak mudah lepas.',
+                'purchase_price' => 115000,
+                'selling_price' => 160000,
+                'minimum_stock' => 15,
+                'initial_stock' => 80,
+                'attributes' => ['Diameter' => '2.6 mm', 'Berat' => '5 Kg per Kotak', 'Klasifikasi' => 'AWS E6013'],
+            ],
+        ];
+
+        // 4. Masukkan Produk ke Database
+        $createdCount = 0;
+        foreach ($productsData as $data) {
+            $cat = $categoryModels[$data['category']] ?? Category::where('name', $data['category'])->first();
+            $sup = $supplierModels[$data['supplier']] ?? Supplier::where('name', $data['supplier'])->first();
+
+            $product = Product::updateOrCreate(
+                ['sku' => $data['sku']],
+                [
+                    'category_id' => $cat->id,
+                    'supplier_id' => $sup?->id,
+                    'name' => $data['name'],
+                    'description' => $data['description'],
+                    'purchase_price' => $data['purchase_price'],
+                    'selling_price' => $data['selling_price'],
+                    'minimum_stock' => $data['minimum_stock'],
+                    'image' => '/storage/products/'.$data['sku'].'.jpg',
+                    'zero_stock_since' => null,
+                ]
+            );
+
+            // Tambahkan atribut spesifikasi
+            if (! empty($data['attributes'])) {
+                foreach ($data['attributes'] as $attrName => $attrVal) {
+                    ProductAttribute::updateOrCreate(
+                        ['product_id' => $product->id, 'name' => $attrName],
+                        ['value' => $attrVal]
+                    );
+                }
+            }
+
+            // Tambahkan initial inventory stock transaction jika belum ada transaksi untuk produk ini
+            if ($product->transactions()->count() === 0 && ! empty($data['initial_stock'])) {
+                StockTransaction::create([
+                    'product_id' => $product->id,
+                    'user_id' => $staffUser?->id ?? 1,
+                    'type' => 'in',
+                    'quantity' => $data['initial_stock'],
+                    'date' => now()->subDays(rand(1, 10))->toDateString(),
+                    'status' => 'completed',
+                    'notes' => 'Penerimaan stok awal dari '.$data['supplier'],
+                ]);
+            }
+
+            $createdCount++;
+        }
+
+        $this->command?->info("Berhasil membuat/memperbarui {$createdCount} produk dan 10 supplier baru!");
+    }
+}

@@ -17,7 +17,20 @@ class OrderRefund extends Model
         'user_id',
         'reason',
         'description',
+        'damage_image',
+        'refund_transfer_proof',
         'status',
+        'return_tracking_number',
+        'goods_received_by',
+        'goods_received_at',
+        'goods_condition_notes',
+        'goods_condition_status',
+        'is_restocked',
+        'quarantine_disposition',
+        'quarantine_reference',
+        'quarantine_notes',
+        'quarantine_processed_by',
+        'quarantine_processed_at',
         'admin_notes',
         'processed_by',
         'processed_at',
@@ -25,6 +38,9 @@ class OrderRefund extends Model
 
     protected $casts = [
         'processed_at' => 'datetime',
+        'goods_received_at' => 'datetime',
+        'quarantine_processed_at' => 'datetime',
+        'is_restocked' => 'boolean',
     ];
 
     public function order(): BelongsTo
@@ -40,5 +56,15 @@ class OrderRefund extends Model
     public function processor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function goodsReceiver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'goods_received_by');
+    }
+
+    public function quarantineProcessor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'quarantine_processed_by');
     }
 }

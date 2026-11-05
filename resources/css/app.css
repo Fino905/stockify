@@ -17,10 +17,30 @@
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
-    --color-brand-purple: #321E48;
-    --color-brand-slate: #43637E;
-    --color-brand-teal: #4EE3D6;
-    --color-brand-mint: #D9FFF5;
+    /* Token Warna Tema Stockify */
+    --color-brand-primary: var(--brand-primary);
+    --color-brand-primary-hover: var(--brand-primary-hover);
+    --color-brand-primary-light: var(--brand-primary-light);
+    --color-brand-primary-light-text: var(--brand-primary-light-text);
+    --color-brand-accent: var(--brand-accent);
+    --color-brand-accent-hover: var(--brand-accent-hover);
+    --color-brand-accent-light: var(--brand-accent-light);
+
+    --color-status-success: var(--color-success);
+    --color-status-success-light: var(--color-success-light);
+    --color-status-success-text: var(--color-success-text);
+
+    --color-status-warning: var(--color-warning);
+    --color-status-warning-light: var(--color-warning-light);
+    --color-status-warning-text: var(--color-warning-text);
+
+    --color-status-danger: var(--color-danger);
+    --color-status-danger-light: var(--color-danger-light);
+    --color-status-danger-text: var(--color-danger-text);
+
+    --color-status-info: var(--color-info);
+    --color-status-info-light: var(--color-info-light);
+    --color-status-info-text: var(--color-info-text);
 
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -67,6 +87,65 @@
 }
 
 :root {
+    /* ==========================================================================
+       PALET WARNA TEMA STOCKIFY (UBAH WARNA APLIKASI DI SINI)
+       --------------------------------------------------------------------------
+       Cukup ganti kode HEX di bawah ini untuk mengubah warna seluruh web!
+       Contoh variasi tema yang bisa Anda coba:
+         - Royal Blue (Default):  #3B5BFD / hover: #2747e4 / light: #eff4ff
+         - Modern Teal:           #0f766e / hover: #115e59 / light: #f0fdfa
+         - Deep Indigo:           #4f46e5 / hover: #4338ca / light: #eef2ff
+         - Emerald Green:         #059669 / hover: #047857 / light: #ecfdf5
+         - Luxury Purple:         #7c3aed / hover: #6d28d9 / light: #f5f3ff
+         - Crimson Rose:          #e11d48 / hover: #be123c / light: #fff1f2
+         - Sunset Amber:          #d97706 / hover: #b45309 / light: #fffbeb
+       ========================================================================== */
+
+    /* 1. WARNA UTAMA / BRAND PRIMARY (Tombol Utama, Header, Menu Aktif, Chart Bar) */
+    --brand-primary: #2563eb;
+    --brand-primary-hover: #1d4ed8;
+    --brand-primary-light: #eff6ff;
+    --brand-primary-light-text: #1d4ed8;
+    --brand-primary-border: #bfdbfe;
+
+    /* 2. WARNA AKSEN / HIGHLIGHT (Elemen Interaktif, Icon Aksen) */
+    --brand-accent: #0ea5e9;
+    --brand-accent-hover: #0284c7;
+    --brand-accent-light: #f0f9ff;
+
+    /* 3. STATUS SISTEM: SUKSES (Barang Masuk, Selesai, Disetujui) */
+    --color-success: #10b981;
+    --color-success-light: #ecfdf5;
+    --color-success-text: #065f46;
+    --color-success-border: #a7f3d0;
+
+    /* 4. STATUS SISTEM: PERINGATAN (Stok Menipis, Menunggu/Pending) */
+    --color-warning: #f59e0b;
+    --color-warning-light: #fffbeb;
+    --color-warning-text: #92400e;
+    --color-warning-border: #fde68a;
+
+    /* 5. STATUS SISTEM: BAHAYA / KRITIS (Barang Keluar, Tolak, Kritis) */
+    --color-danger: #f43f5e;
+    --color-danger-hover: #e11d48;
+    --color-danger-light: #fff1f2;
+    --color-danger-text: #9f1239;
+    --color-danger-border: #fecdd3;
+
+    /* 6. STATUS SISTEM: INFORMASI (Logistik, Pengiriman) */
+    --color-info: #0284c7;
+    --color-info-light: #f0f9ff;
+    --color-info-text: #075985;
+    --color-info-border: #bae6fd;
+
+    /* 7. LATAR BELAKANG & KARTU */
+    --brand-bg: #f8fafc;
+    --brand-surface: #ffffff;
+    --brand-border: #e2e8f0;
+    --brand-text-main: #0f172a;
+    --brand-text-muted: #64748b;
+
+    /* System Default Tokens */
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -103,6 +182,19 @@
 }
 
 .dark {
+    /* Dark Theme Token Overrides */
+    --brand-primary: #3b82f6;
+    --brand-primary-hover: #2563eb;
+    --brand-primary-light: rgba(59, 130, 246, 0.16);
+    --brand-primary-light-text: #93c5fd;
+    --brand-primary-border: rgba(59, 130, 246, 0.35);
+
+    --brand-bg: #0f172a;
+    --brand-surface: #1e293b;
+    --brand-border: #334155;
+    --brand-text-main: #f8fafc;
+    --brand-text-muted: #94a3b8;
+
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.145 0 0);
@@ -147,90 +239,606 @@
     }
 }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-12px) rotate(2deg);
-    }
+/* ==========================================================================
+   DYNAMIC THEME UTILITY HELPERS
+   Memastikan class tema dapat langsung digunakan dan otomatis reaktif
+   ========================================================================== */
+
+/* Brand Primary Utilities */
+.bg-theme-primary {
+    background-color: var(--brand-primary) !important;
 }
 
-@keyframes floatReverse {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(10px) rotate(-2deg);
-    }
+.hover\:bg-theme-primary-hover:hover,
+.hover-bg-theme-primary-hover:hover {
+    background-color: var(--brand-primary-hover) !important;
 }
 
-@keyframes progressFlow {
+.bg-theme-primary-light {
+    background-color: var(--brand-primary-light) !important;
+}
+
+.text-theme-primary {
+    color: var(--brand-primary) !important;
+}
+
+.text-theme-primary-text {
+    color: var(--brand-primary-light-text) !important;
+}
+
+.border-theme-primary {
+    border-color: var(--brand-primary) !important;
+}
+
+.ring-theme-primary {
+    --tw-ring-color: var(--brand-primary) !important;
+}
+
+/* Status Utilities */
+.bg-theme-success {
+    background-color: var(--color-success) !important;
+}
+
+.bg-theme-success-light {
+    background-color: var(--color-success-light) !important;
+}
+
+.text-theme-success {
+    color: var(--color-success) !important;
+}
+
+.text-theme-success-text {
+    color: var(--color-success-text) !important;
+}
+
+.border-theme-success {
+    border-color: var(--color-success-border) !important;
+}
+
+.bg-theme-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.bg-theme-warning-light {
+    background-color: var(--color-warning-light) !important;
+}
+
+.text-theme-warning {
+    color: var(--color-warning) !important;
+}
+
+.text-theme-warning-text {
+    color: var(--color-warning-text) !important;
+}
+
+.border-theme-warning {
+    border-color: var(--color-warning-border) !important;
+}
+
+.bg-theme-danger {
+    background-color: var(--color-danger) !important;
+}
+
+.bg-theme-danger-light {
+    background-color: var(--color-danger-light) !important;
+}
+
+.text-theme-danger {
+    color: var(--color-danger) !important;
+}
+
+.text-theme-danger-text {
+    color: var(--color-danger-text) !important;
+}
+
+.border-theme-danger {
+    border-color: var(--color-danger-border) !important;
+}
+
+/* Global Tailwind Palette Mapping:
+   Memetakan tombol, badge, dan aksen biru & teal secara langsung ke variabel tema! */
+.bg-blue-600,
+.bg-teal-800,
+.bg-\[\#3B5BFD\] {
+    background-color: var(--brand-primary) !important;
+}
+
+.hover\:bg-blue-700:hover,
+.hover\:bg-blue-600:hover,
+.hover\:bg-teal-900:hover,
+.hover\:bg-teal-950:hover {
+    background-color: var(--brand-primary-hover) !important;
+}
+
+.text-blue-600,
+.text-teal-800,
+.text-\[\#3B5BFD\] {
+    color: var(--brand-primary) !important;
+}
+
+.border-blue-600,
+.border-teal-800 {
+    border-color: var(--brand-primary) !important;
+}
+
+.bg-blue-50,
+.bg-blue-100,
+.bg-teal-50 {
+    background-color: var(--brand-primary-light) !important;
+}
+
+.text-blue-700,
+.text-blue-800,
+.text-teal-900 {
+    color: var(--brand-primary-light-text) !important;
+}
+
+.border-blue-100,
+.border-blue-200 {
+    border-color: var(--brand-primary-border) !important;
+}
+
+.focus\:ring-teal-700:focus,
+.focus\:ring-blue-500:focus {
+    --tw-ring-color: var(--brand-primary) !important;
+}
+
+/* ==========================================================================
+   FULL DASHBOARD ANIMATIONS (Living, Dynamic, Non-Neon)
+   Animasi menyeluruh pada dashboard: entry cascade, bar chart growth,
+   live status beacon, alert heartbeat, dan transisi halus tanpa glow neon.
+   ========================================================================== */
+
+@keyframes barGrow {
     0% {
-        margin-left: 0%;
-        width: 15%;
+        transform: scaleY(0);
+        opacity: 0.2;
     }
-    50% {
-        margin-left: 35%;
-        width: 50%;
-    }
+
     100% {
-        margin-left: 100%;
-        width: 15%;
-    }
-}
-
-@keyframes shimmerGlow {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
-}
-
-.animate-float {
-    animation: float 4s ease-in-out infinite;
-}
-
-.animate-float-delayed {
-    animation: floatReverse 5s ease-in-out 1s infinite;
-}
-
-.animate-progress-flow {
-    animation: progressFlow 1.4s ease-in-out infinite;
-}
-
-.animate-shimmer {
-    background: linear-gradient(90deg, rgba(78,227,214,0) 0%, rgba(78,227,214,0.5) 50%, rgba(78,227,214,0) 100%);
-    background-size: 200% 100%;
-    animation: shimmerGlow 2s infinite;
-}
-
-@keyframes pulseSubtle {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-    50% {
-        transform: scale(1.04);
+        transform: scaleY(1);
         opacity: 1;
     }
 }
 
-.animate-pulse-subtle {
-    animation: pulseSubtle 5s ease-in-out infinite;
+@keyframes cascadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes beaconRing {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+@keyframes beaconRingAmber {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    14% {
+        transform: scale(1.04);
+    }
+
+    28% {
+        transform: scale(1);
+    }
+
+    42% {
+        transform: scale(1.03);
+    }
+
+    70% {
+        transform: scale(1);
+    }
+}
+
+@keyframes numPop {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.92);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 @keyframes floatGentle {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0px);
     }
+
     50% {
         transform: translateY(-6px);
     }
 }
 
-.animate-float-gentle {
+@keyframes shimmerWave {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes rotateSlow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Chart Bars Growth Animation */
+.animate-bar-grow {
+    transform-origin: bottom;
+    animation: barGrow 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Staggered Cascade Entrances for Cards & Lists */
+.cascade-1 {
+    animation: cascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+.cascade-2 {
+    animation: cascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.cascade-3 {
+    animation: cascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.19s both;
+}
+
+.cascade-4 {
+    animation: cascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
+}
+
+.cascade-5 {
+    animation: cascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.33s both;
+}
+
+.cascade-6 {
+    animation: cascadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both;
+}
+
+/* Living Status Beacons */
+.live-beacon {
+    animation: beaconRing 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.live-beacon-amber {
+    animation: beaconRingAmber 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Alert Heartbeat */
+.animate-heartbeat {
+    animation: heartbeat 2.8s ease-in-out infinite;
+}
+
+/* Counter & Number Pop */
+.animate-num-pop {
+    animation: numPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Gentle Floating for Badges */
+.animate-float,
+.animate-float-bold {
     animation: floatGentle 3s ease-in-out infinite;
+}
+
+.animate-float-delayed,
+.animate-float-bold-delayed {
+    animation: floatGentle 3.5s ease-in-out 0.8s infinite;
+}
+
+.animate-rotate-slow {
+    animation: rotateSlow 20s linear infinite;
+}
+
+/* Shimmer Wave */
+.shimmer-wave {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0) 100%);
+    background-size: 200% 100%;
+    animation: shimmerWave 4s ease-in-out infinite;
+}
+
+/* Normalized, Sleek Card Hover */
+.card-lift {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.2s ease;
+    will-change: transform, box-shadow;
+}
+
+.card-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
+}
+
+.card-lift:active {
+    transform: translateY(0px) scale(0.99);
+}
+
+.card-lift-sm {
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.card-lift-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+}
+
+.card-lift-sm:active {
+    transform: translateY(0px) scale(0.995);
+}
+
+/* Sleek Button Press Feedback */
+.btn-press {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.btn-press:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 6px 14px -3px rgba(15, 23, 42, 0.12);
+}
+
+.btn-press:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+/* ==========================================================================
+   SCROLL REVEAL ANIMATIONS (INTERSECTION OBSERVER)
+   ========================================================================== */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.scroll-reveal-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.scroll-reveal-right {
+    opacity: 0;
+    transform: translateX(32px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.scroll-reveal-scale {
+    opacity: 0;
+    transform: scale(0.93) translateY(18px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+/* Revealed state triggered when scrolled into view */
+.scroll-reveal.is-revealed,
+.scroll-reveal-left.is-revealed,
+.scroll-reveal-right.is-revealed,
+.scroll-reveal-scale.is-revealed {
+    opacity: 1 !important;
+    transform: translate(0, 0) scale(1) !important;
+}
+
+/* Stagger Delays for Grid / Cascade Items */
+.reveal-delay-100 { transition-delay: 100ms; }
+.reveal-delay-150 { transition-delay: 150ms; }
+.reveal-delay-200 { transition-delay: 200ms; }
+.reveal-delay-250 { transition-delay: 250ms; }
+.reveal-delay-300 { transition-delay: 300ms; }
+.reveal-delay-350 { transition-delay: 350ms; }
+.reveal-delay-400 { transition-delay: 400ms; }
+.reveal-delay-500 { transition-delay: 500ms; }
+.reveal-delay-600 { transition-delay: 600ms; }
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .scroll-reveal,
+    .scroll-reveal-left,
+    .scroll-reveal-right,
+    .scroll-reveal-scale {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}
+
+/* ==========================================================================
+   PRINT STYLES: DOKUMEN LAPORAN GUDANG & INVENTARIS RESMI
+   --------------------------------------------------------------------------
+   Memastikan dokumen cetak / Simpan PDF rapi, bersih, tanpa sidebar/navbar,
+   dan sesuai standar format cetak dokumen pergudangan (A4).
+   ========================================================================== */
+@media screen {
+    .print-only {
+        display: none !important;
+    }
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 12mm 15mm 15mm 15mm;
+    }
+
+    /* Sembunyikan elemen non-cetak (navigasi, tombol, sidebar, dialog dll) */
+    nav,
+    aside,
+    header,
+    footer,
+    .no-print,
+    .print\:hidden,
+    button,
+    select,
+    input,
+    [role="dialog"],
+    .backdrop-blur-xs,
+    .live-beacon {
+        display: none !important;
+    }
+
+    /* Tampilkan elemen khusus cetak (kop surat, lembar pengesahan tanda tangan) */
+    .print-only,
+    .print\:block {
+        display: block !important;
+    }
+
+    .print\:flex {
+        display: flex !important;
+    }
+
+    .print\:grid {
+        display: grid !important;
+    }
+
+    /* Format kertas putih bersih */
+    html, body {
+        background: #ffffff !important;
+        color: #111827 !important;
+        font-size: 9.5pt !important;
+        line-height: 1.35 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Kontainer utama mengambil 100% lebar kertas tanpa margin sidebar */
+    main {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    main > div {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        space-y: 0 !important;
+    }
+
+    /* Lepaskan overflow scroll agar tabel tidak terpotong dan bisa terbagi ke halaman berikutnya */
+    .overflow-x-auto,
+    .overflow-y-auto,
+    .overflow-hidden {
+        overflow: visible !important;
+        max-height: none !important;
+    }
+
+    /* Format Tabel Resmi */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 10px !important;
+        margin-bottom: 12px !important;
+        page-break-inside: auto !important;
+    }
+
+    thead {
+        display: table-header-group !important; /* Otomatis mengulang header tabel di setiap halaman baru */
+    }
+
+    tfoot {
+        display: table-footer-group !important;
+    }
+
+    tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+    }
+
+    th, td {
+        border: 1px solid #d1d5db !important;
+        padding: 4px 6px !important;
+        color: #111827 !important;
+        background: transparent !important;
+    }
+
+    th {
+        background-color: #f3f4f6 !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        font-size: 8.5pt !important;
+    }
+
+    /* Hilangkan shadow & efek layar */
+    .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-xs, .card-lift {
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+    }
+
+    .rounded-xl, .rounded-2xl {
+        border-radius: 4px !important;
+    }
+
+    /* Cegah kartu atau blok tanda tangan terpotong di tengah */
+    .page-break-avoid {
+        page-break-inside: avoid !important;
+    }
 }

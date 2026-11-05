@@ -15,14 +15,20 @@ import {
     CheckCircle2,
     ShoppingBag,
     Sparkles,
-    UserCheck
+    UserCheck,
+    UploadCloud,
+    Receipt,
+    Image as ImageIcon,
+    Camera
 } from 'lucide-react';
+import { CameraCaptureModal } from '@/components/common/camera-capture-modal';
 
 interface Product {
     id: number;
     name: string;
     sku: string;
     description: string | null;
+    image?: string | null;
     selling_price: number;
     current_stock: number;
     category_name: string;
@@ -49,6 +55,9 @@ export function DummyPaymentModal({ isOpen, onClose, product, staffMembers }: Pr
     const [selectedStaffId, setSelectedStaffId] = useState<number>(staffMembers[0]?.id || 0);
     const [notes, setNotes] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('qris');
+    const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
+    const [paymentProofPreview, setPaymentProofPreview] = useState<string | null>(null);
+    const [showCameraModal, setShowCameraModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [secondsLeft, setSecondsLeft] = useState(900); // 15 menit countdown
 
@@ -59,6 +68,8 @@ export function DummyPaymentModal({ isOpen, onClose, product, staffMembers }: Pr
         setSelectedStaffId(staffMembers[0]?.id || 0);
         setNotes('');
         setPaymentMethod('qris');
+        setPaymentProofFile(null);
+        setPaymentProofPreview(null);
         setIsSubmitting(false);
         setSecondsLeft(900);
     }, [product, isOpen]);
@@ -83,13 +94,17 @@ export function DummyPaymentModal({ isOpen, onClose, product, staffMembers }: Pr
 
     const handleConfirmPayment = () => {
         setIsSubmitting(true);
-        router.post('/orders', {
-            product_id: product.id,
-            quantity: quantity,
-            payment_method: paymentMethod,
-            staff_id: selectedStaffId || undefined,
-            notes: notes || undefined,
-        }, {
+        const formData = new FormData();
+        formData.append('product_id', String(product.id));
+        formData.append('quantity', String(quantity));
+        formData.append('payment_method', paymentMethod);
+        if (selectedStaffId) formData.append('staff_id', String(selectedStaffId));
+        if (notes) formData.append('notes', notes);
+        if (paymentProofFile) {
+            formData.append('payment_proof', paymentProofFile);
+        }
+
+        router.post('/orders', formData, {
             preserveScroll: true,
             onFinish: () => {
                 setIsSubmitting(false);
@@ -196,20 +211,31 @@ export function DummyPaymentModal({ isOpen, onClose, product, staffMembers }: Pr
                     {step === 'details' && (
                         <div className="space-y-4">
                             {/* Product Card */}
-                            <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/30 flex items-start justify-between">
-                                <div>
-                                    <span className="text-[11px] font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                            <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/30 flex items-center gap-3.5">
+                                {product.image ? (
+                                    <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="w-16 h-16 object-cover rounded-xl border border-gray-200 dark:border-gray-600 shrink-0 shadow-xs"
+                                    />
+                                ) : (
+                                    <div className="w-16 h-16 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                        <Package className="w-8 h-8" />
+                                    </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
                                         {product.category_name}
                                     </span>
-                                    <h4 className="font-bold text-gray-900 dark:text-white text-base">
+                                    <h4 className="font-bold text-gray-900 dark:text-white text-base truncate">
                                         {product.name}
                                     </h4>
                                     <p className="text-xs text-gray-500 font-mono mt-0.5">SKU: {product.sku}</p>
-                                    <div className="mt-2 text-sm font-bold text-blue-600 dark:text-blue-400">
+                                    <div className="mt-1 text-sm font-bold text-blue-600 dark:text-blue-400">
                                         Rp {unitPrice.toLocaleString('id-ID')} <span className="text-xs font-normal text-gray-500">/ unit</span>
                                     </div>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right shrink-0">
                                     <span className="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                                         Stok: {product.current_stock}
                                     </span>
@@ -414,6 +440,102 @@ export function DummyPaymentModal({ isOpen, onClose, product, staffMembers }: Pr
                                     No. Referensi: <span className="font-mono text-gray-200">{dummyRef}</span>
                                 </div>
                             </div>
+
+                            {/* UNGGAH BUKTI TRANSAKSI / TRANSFER (DITAMPILKAN KE MANAJER) */}
+                            <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-750/70 space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                                        <Receipt className="w-4 h-4 text-blue-600" />
+                                        <span>Unggah Bukti Transaksi / Transfer</span>
+                                        <span className="text-[10px] font-normal text-emerald-600 dark:text-emerald-400 font-semibold">(Untuk Verifikasi Manajer)</span>
+                                    </label>
+                                    {paymentProofPreview && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setPaymentProofFile(null);
+                                                setPaymentProofPreview(null);
+                                            }}
+                                            className="text-[11px] text-rose-500 hover:underline font-semibold cursor-pointer"
+                                        >
+                                            Hapus Foto
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                                    Lampirkan screenshot/foto struk transfer agar dapat langsung diperiksa dan dikonfirmasi oleh Manajer Gudang untuk mengeluarkan barang.
+                                </p>
+
+                                {paymentProofPreview ? (
+                                    <div className="relative rounded-xl overflow-hidden border-2 border-emerald-500/50 bg-gray-900/10 p-2 flex items-center justify-center">
+                                        <img 
+                                            src={paymentProofPreview} 
+                                            alt="Bukti Transfer Customer" 
+                                            className="max-h-48 rounded-lg object-contain"
+                                        />
+                                        <div className="absolute top-2 right-2 flex items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowCameraModal(true)}
+                                                className="px-2.5 py-1 bg-gray-900/80 hover:bg-black text-white text-[10px] font-bold rounded-lg shadow-sm flex items-center gap-1 backdrop-blur-xs cursor-pointer transition-colors"
+                                            >
+                                                <Camera className="w-3 h-3" /> Foto Ulang
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPaymentProofFile(null);
+                                                    setPaymentProofPreview(null);
+                                                }}
+                                                className="px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
+                                            >
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCameraModal(true)}
+                                            className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99]"
+                                        >
+                                            <Camera className="w-4 h-4" />
+                                            <span>Buka Kamera Langsung (Jepret Foto Resi)</span>
+                                        </button>
+
+                                        <div className="flex items-center gap-2 my-1">
+                                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                                            <span className="text-[10px] uppercase font-semibold text-gray-400">Atau Pilih dari Galeri</span>
+                                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                                        </div>
+
+                                        <label className="flex flex-col items-center justify-center p-3.5 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 rounded-xl cursor-pointer bg-white dark:bg-gray-800 transition-colors">
+                                            <UploadCloud className="w-6 h-6 text-gray-400 mb-1" />
+                                            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Pilih Foto Bukti Transfer / Resi
+                                            </span>
+                                            <span className="text-[10px] text-gray-400 mt-0.5">Format JPG, PNG, atau WEBP (Maksimal 5MB)</span>
+                                            <span className="text-[9px] text-blue-600 dark:text-blue-400 font-medium mt-1">
+                                                *Jika dikosongkan, sistem akan membuat struk digital simulasi otomatis
+                                            </span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                capture="environment"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        setPaymentProofFile(file);
+                                                        setPaymentProofPreview(URL.createObjectURL(file));
+                                                    }
+                                                }}
+                                            />
+                                        </label>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -494,6 +616,18 @@ export function DummyPaymentModal({ isOpen, onClose, product, staffMembers }: Pr
                     )}
                 </div>
             </div>
+
+            {/* Modal Kamera Langsung */}
+            <CameraCaptureModal
+                isOpen={showCameraModal}
+                onClose={() => setShowCameraModal(false)}
+                onCapture={(file, previewUrl) => {
+                    setPaymentProofFile(file);
+                    setPaymentProofPreview(previewUrl);
+                }}
+                title="Ambil Foto Bukti Pembayaran / Struk"
+                fileNamePrefix="bukti-transfer"
+            />
         </div>
     );
 }

@@ -20,7 +20,7 @@ import type { NavItem } from '@/types';
 export function AppSidebar() {
     const page = usePage();
     const dashboardUrl = page.props.currentTeam
-        ? dashboard(page.props.currentTeam.slug)
+        ? dashboard()
         : '/';
 
     const mainNavItems: NavItem[] = [

@@ -11,19 +11,34 @@ class QuickSwitchController extends Controller
 {
     public function __invoke(Request $request, string $role): RedirectResponse
     {
-        $validRoles = ['admin', 'manajer_gudang', 'staff_gudang', 'customer'];
-        if (! in_array($role, $validRoles, true)) {
-            return back()->withErrors(['role' => 'Role tidak valid.']);
+        abort_unless(app()->environment('local', 'testing'), 404, 'Fitur demo switch role hanya tersedia di environment development.');
+
+        $roleMap = [
+            'admin' => 'admin',
+            'administrator' => 'admin',
+            'manajer' => 'manajer_gudang',
+            'manajer_gudang' => 'manajer_gudang',
+            'manager' => 'manajer_gudang',
+            'staff' => 'staff_gudang',
+            'staff_gudang' => 'staff_gudang',
+            'customer' => 'customer',
+        ];
+
+        $key = strtolower(str_replace([' ', '-'], '_', $role));
+        if (! isset($roleMap[$key])) {
+            return back()->withErrors(['role' => 'Role demo tidak valid.']);
         }
 
-        $user = User::where('role', $role)->first();
+        $targetRole = $roleMap[$key];
+        $user = User::where('role', $targetRole)->first();
         if ($user) {
             Auth::login($user);
             $request->session()->regenerate();
+            $request->session()->forget('url.intended');
 
-            return redirect()->route('dashboard')->with('success', "Beralih login sebagai: {$user->name} ({$role})");
+            return redirect()->to('/dashboard')->with('success', "Berhasil masuk sebagai demo: {$user->name} ({$targetRole})");
         }
 
-        return back()->withErrors(['role' => "Akun dengan role {$role} tidak ditemukan."]);
+        return back()->withErrors(['role' => "Akun demo dengan role {$targetRole} tidak ditemukan."]);
     }
 }

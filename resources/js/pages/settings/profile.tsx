@@ -1,5 +1,5 @@
-import { Form, Head, usePage } from '@inertiajs/react';
-import { Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
@@ -23,6 +23,16 @@ export default function Profile({
     status?: string;
 }) {
     const { auth } = usePage<PageProps>().props;
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
+    const currentAvatar = previewUrl || auth.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user.name)}&background=321E48&color=fff`;
 
     return (
         <>
@@ -34,11 +44,12 @@ export default function Profile({
                 <Heading
                     variant="small"
                     title="Profile"
-                    description="Update your name and email address"
+                    description="Perbarui informasi profil dan foto avatar Anda"
                 />
 
                 <Form
                     {...ProfileController.update.form()}
+                    encType="multipart/form-data"
                     options={{
                         preserveScroll: true,
                     }}
@@ -46,6 +57,30 @@ export default function Profile({
                 >
                     {({ processing, errors }) => (
                         <>
+                            {/* Avatar Section */}
+                            <div className="flex items-center gap-5 pb-5 border-b border-gray-100 dark:border-gray-800">
+                                <img
+                                    src={currentAvatar}
+                                    alt={auth.user.name}
+                                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700 shadow-xs"
+                                />
+                                <div className="space-y-1">
+                                    <Label htmlFor="avatar" className="block text-xs font-semibold">
+                                        Foto Profil (Avatar)
+                                    </Label>
+                                    <Input
+                                        id="avatar"
+                                        type="file"
+                                        name="avatar"
+                                        accept="image/png, image/jpeg, image/jpg, image/webp"
+                                        onChange={handleAvatarChange}
+                                        className="text-xs file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                                    />
+                                    <p className="text-[11px] text-gray-400">PNG, JPG, atau WEBP (Maks. 2MB)</p>
+                                    <InputError className="mt-1" message={errors.avatar} />
+                                </div>
+                            </div>
+
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
 

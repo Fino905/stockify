@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Search, 
     Filter, 
@@ -13,7 +13,9 @@ import {
     Store,
     Info,
     X,
-    ThumbsUp
+    ThumbsUp,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
 import { DummyPaymentModal } from './dummy-payment-modal';
 
@@ -22,6 +24,7 @@ interface Product {
     name: string;
     sku: string;
     description: string | null;
+    image?: string | null;
     purchase_price: number;
     selling_price: number;
     minimum_stock: number;
@@ -80,10 +83,37 @@ export function CustomerCatalog({ products = [], categories = [], staffMembers =
         return matchesSearch && matchesCat && matchesStock;
     });
 
+    // Pagination (Batasi 10 produk per halaman)
+    const [currentPage, setCurrentPage] = useState(1);
+    const PRODUCTS_PER_PAGE = 10;
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedCategory, stockFilter]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
+    const safePage = Math.min(Math.max(1, currentPage), totalPages);
+    const startIndex = (safePage - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = Math.min(startIndex + PRODUCTS_PER_PAGE, filteredProducts.length);
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+    const getPageNumbers = (current: number, total: number): (number | string)[] => {
+        if (total <= 7) {
+            return Array.from({ length: total }, (_, i) => i + 1);
+        }
+        if (current <= 4) {
+            return [1, 2, 3, 4, 5, '...', total];
+        }
+        if (current >= total - 3) {
+            return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+        }
+        return [1, '...', current - 1, current, current + 1, '...', total];
+    };
+
     return (
         <div className="space-y-6">
             {/* Top Showcase Banner */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white p-6 md:p-8 shadow-xl">
+            <div className="card-lift relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white p-6 md:p-8 shadow-xl">
                 <div className="relative z-10 max-w-2xl space-y-3">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold">
                         <Store className="w-4 h-4 text-amber-300" />
@@ -102,7 +132,7 @@ export function CustomerCatalog({ products = [], categories = [], staffMembers =
             </div>
 
             {/* Filter and Search Bar */}
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div className="card-lift-sm bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
                 <div className="relative w-full md:w-80">
                     <Search className="w-4 h-4 absolute left-3.5 top-3 text-gray-400" />
                     <input
@@ -166,7 +196,7 @@ export function CustomerCatalog({ products = [], categories = [], staffMembers =
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    {filteredProducts.map((product) => {
+                    {paginatedProducts.map((product) => {
                         const isOutOfStock = product.current_stock <= 0;
                         const rating = product.avg_rating || 5.0;
                         const reviewsCount = product.reviews_count || 0;
@@ -174,34 +204,62 @@ export function CustomerCatalog({ products = [], categories = [], staffMembers =
                         return (
                             <div 
                                 key={product.id}
-                                className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200 flex flex-col justify-between overflow-hidden group"
+                                className="card-lift bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between overflow-hidden group"
                             >
-                                {/* Card Top Image Placeholder / Category Badge */}
-                                <div className="p-4 bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-700/30 dark:to-gray-800 border-b border-gray-100 dark:border-gray-700/60 relative">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                                {/* Card Top Image / Product Photo Display */}
+                                <div className="relative border-b border-gray-100 dark:border-gray-700/60 overflow-hidden bg-gray-50 dark:bg-gray-900/40">
+                                    {/* Floating Badges */}
+                                    <div className="absolute top-2.5 left-2.5 right-2.5 z-10 flex items-center justify-between pointer-events-none">
+                                        <span className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full shadow-xs ${
+                                            product.image
+                                                ? 'bg-blue-600/95 text-white backdrop-blur-md'
+                                                : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                                        }`}>
                                             {product.category_name}
                                         </span>
-                                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                                            isOutOfStock 
-                                                ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300' 
-                                                : product.current_stock <= product.minimum_stock
-                                                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                                                    : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shadow-xs ${
+                                            product.image
+                                                ? isOutOfStock
+                                                    ? 'bg-rose-600/95 text-white backdrop-blur-md'
+                                                    : product.current_stock <= product.minimum_stock
+                                                        ? 'bg-amber-500/95 text-white backdrop-blur-md'
+                                                        : 'bg-emerald-600/95 text-white backdrop-blur-md'
+                                                : isOutOfStock
+                                                    ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                                                    : product.current_stock <= product.minimum_stock
+                                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                                                        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
                                         }`}>
                                             {isOutOfStock ? 'Stok Habis' : `Tersedia: ${product.current_stock} unit`}
                                         </span>
                                     </div>
 
-                                    {/* Display Product Icon or Name Box */}
-                                    <div className="h-28 rounded-xl bg-white dark:bg-gray-700/60 flex flex-col items-center justify-center p-3 text-center border border-gray-100 dark:border-gray-600/40 group-hover:scale-[1.02] transition-transform">
-                                        <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2 shadow-xs">
-                                            <Package className="w-6 h-6" />
+                                    {/* Product Photo or Placeholder */}
+                                    {product.image ? (
+                                        <div className="h-44 w-full overflow-hidden bg-gray-100 dark:bg-gray-800 relative group-hover:scale-105 transition-transform duration-300">
+                                            {/* Gradient scrim for badge readability */}
+                                            <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/50 to-transparent z-[5] pointer-events-none" />
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <div className="absolute bottom-2 right-2 bg-gray-900/70 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded-md shadow-xs">
+                                                {product.sku}
+                                            </div>
                                         </div>
-                                        <span className="text-xs font-mono text-gray-400 dark:text-gray-400">
-                                            {product.sku}
-                                        </span>
-                                    </div>
+                                    ) : (
+                                        <div className="p-4 bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-700/30 dark:to-gray-800">
+                                            <div className="h-28 mt-7 rounded-xl bg-white dark:bg-gray-700/60 flex flex-col items-center justify-center p-3 text-center border border-gray-100 dark:border-gray-600/40 group-hover:scale-[1.02] transition-transform">
+                                                <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2 shadow-xs">
+                                                    <Package className="w-6 h-6" />
+                                                </div>
+                                                <span className="text-xs font-mono text-gray-400 dark:text-gray-400">
+                                                    {product.sku}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Card Body */}
@@ -246,7 +304,7 @@ export function CustomerCatalog({ products = [], categories = [], staffMembers =
                                             type="button"
                                             onClick={() => setSelectedProductForBuy(product)}
                                             disabled={isOutOfStock}
-                                            className="px-3.5 py-2 text-xs font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                                            className="btn-press px-3.5 py-2 text-xs font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
                                         >
                                             <ShoppingBag className="w-3.5 h-3.5" />
                                             {isOutOfStock ? 'Habis' : 'Beli'}
@@ -256,6 +314,62 @@ export function CustomerCatalog({ products = [], categories = [], staffMembers =
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Pagination Controls */}
+            {filteredProducts.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500">
+                    <span>
+                        Menampilkan {startIndex + 1}-{endIndex} dari {filteredProducts.length} produk (Halaman {safePage} dari {totalPages})
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                        <button
+                            type="button"
+                            disabled={safePage <= 1}
+                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            className="inline-flex items-center justify-center p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                            aria-label="Previous Page"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+
+                        {getPageNumbers(safePage, totalPages).map((p, idx) => {
+                            if (p === '...') {
+                                return (
+                                    <span key={`ellipsis-${idx}`} className="px-1.5 text-gray-400 select-none">
+                                        ...
+                                    </span>
+                                );
+                            }
+                            const pageNum = Number(p);
+                            const isCurrent = pageNum === safePage;
+                            return (
+                                <button
+                                    key={pageNum}
+                                    type="button"
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    className={`min-w-[32px] px-2.5 py-1 rounded-lg font-medium transition-colors cursor-pointer text-xs ${
+                                        isCurrent
+                                            ? 'bg-blue-600 text-white font-bold shadow-xs'
+                                            : 'border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
+                                    }`}
+                                >
+                                    {pageNum}
+                                </button>
+                            );
+                        })}
+
+                        <button
+                            type="button"
+                            disabled={safePage >= totalPages}
+                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                            className="inline-flex items-center justify-center p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                            aria-label="Next Page"
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -274,14 +388,27 @@ export function CustomerCatalog({ products = [], categories = [], staffMembers =
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-in fade-in">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-100 dark:border-gray-700 max-h-[80vh] flex flex-col">
                         <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
-                            <div>
-                                <h3 className="font-bold text-sm text-gray-900 dark:text-white">
-                                    Ulasan Pelanggan: {reviewProduct.name}
-                                </h3>
-                                <div className="flex items-center gap-1.5 text-xs text-amber-500 font-bold mt-0.5">
-                                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                    <span>{reviewProduct.avg_rating?.toFixed(1) || '5.0'} / 5.0</span>
-                                    <span className="text-gray-400 font-normal">({reviewProduct.reviews_count || 0} Ulasan)</span>
+                            <div className="flex items-center gap-3">
+                                {reviewProduct.image ? (
+                                    <img
+                                        src={reviewProduct.image}
+                                        alt={reviewProduct.name}
+                                        className="w-12 h-12 object-cover rounded-xl border border-gray-200 dark:border-gray-700 shrink-0 shadow-xs"
+                                    />
+                                ) : (
+                                    <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                        <Package className="w-6 h-6" />
+                                    </div>
+                                )}
+                                <div>
+                                    <h3 className="font-bold text-sm text-gray-900 dark:text-white line-clamp-1">
+                                        Ulasan: {reviewProduct.name}
+                                    </h3>
+                                    <div className="flex items-center gap-1.5 text-xs text-amber-500 font-bold mt-0.5">
+                                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                        <span>{reviewProduct.avg_rating?.toFixed(1) || '5.0'} / 5.0</span>
+                                        <span className="text-gray-400 font-normal">({reviewProduct.reviews_count || 0} Ulasan)</span>
+                                    </div>
                                 </div>
                             </div>
                             <button

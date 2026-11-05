@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
@@ -24,6 +25,11 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'payment_reference',
+        'payment_proof',
+        'shipping_courier',
+        'tracking_number',
+        'shipped_at',
+        'received_at',
         'order_status',
         'notes',
     ];
@@ -32,6 +38,8 @@ class Order extends Model
         'quantity' => 'integer',
         'unit_price' => 'decimal:2',
         'total_price' => 'decimal:2',
+        'shipped_at' => 'datetime',
+        'received_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -57,5 +65,10 @@ class Order extends Model
     public function refund(): HasOne
     {
         return $this->hasOne(OrderRefund::class, 'order_id');
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(OrderMessage::class, 'order_id')->oldest();
     }
 }

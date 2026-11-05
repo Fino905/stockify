@@ -1,13 +1,13 @@
 import React from 'react';
-import { 
-    LayoutDashboard, 
-    Boxes, 
-    Tags, 
-    Truck, 
-    ArrowLeftRight, 
-    FileText, 
-    Users, 
-    Sliders, 
+import {
+    LayoutDashboard,
+    Boxes,
+    Tags,
+    Truck,
+    ArrowLeftRight,
+    FileText,
+    Users,
+    Sliders,
     Database,
     Shield,
     ClipboardCheck,
@@ -21,7 +21,9 @@ import {
     Store,
     Receipt,
     RotateCcw,
-    Star
+    Star,
+    StickyNote,
+    Wallet
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -34,6 +36,7 @@ interface SidebarProps {
         name?: string;
         role?: string;
         email?: string;
+        avatar?: string | null;
     } | null;
     productsCount?: number;
     transactionsCount?: number;
@@ -41,10 +44,10 @@ interface SidebarProps {
     pendingOutCount?: number;
 }
 
-export function FlowbiteSidebar({ 
-    isOpen, 
+export function FlowbiteSidebar({
+    isOpen,
     onToggleSidebar,
-    activeTab = 'dashboard', 
+    activeTab = 'dashboard',
     onSelectTab,
     userRole = 'admin',
     currentUser,
@@ -56,37 +59,44 @@ export function FlowbiteSidebar({
     const allNavItems = [
         {
             id: 'dashboard',
-            label: userRole === 'staff_gudang' ? 'Tugas Operasional' : 'Dashboard',
+            label: userRole === 'staff_gudang' 
+                ? 'Tugas Operasional' 
+                : (userRole === 'manajer_gudang' ? 'Dashboard Stok' : 'Dashboard'),
             icon: LayoutDashboard,
-            badge: null,
+            badge: userRole === 'staff_gudang' && (pendingInCount + pendingOutCount > 0)
+                ? `${pendingInCount + pendingOutCount}`
+                : null,
+            badgeColor: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
             roles: ['admin', 'manajer_gudang', 'staff_gudang'],
         },
         {
             id: 'products',
-            label: 'Daftar Produk',
+            label: userRole === 'manajer_gudang' ? 'Daftar Produk' : 'Daftar Produk',
             icon: Boxes,
             badge: productsCount > 0 ? `${productsCount}` : null,
-            roles: ['admin', 'manajer_gudang', 'staff_gudang'],
+            roles: ['admin', 'manajer_gudang'],
         },
         {
             id: 'categories',
             label: 'Kategori Produk',
             icon: Tags,
             badge: null,
-            roles: ['admin', 'manajer_gudang'],
+            roles: ['admin'],
         },
         {
             id: 'suppliers',
-            label: 'Supplier / Pemasok',
+            label: userRole === 'manajer_gudang' ? 'Daftar Supplier' : 'Supplier / Pemasok',
             icon: Truck,
             badge: null,
             roles: ['admin', 'manajer_gudang'],
         },
         {
             id: 'transactions',
-            label: 'Transaksi Stok',
+            label: userRole === 'staff_gudang' ? 'Konfirmasi Stok' : 'Transaksi Stok',
             icon: ArrowLeftRight,
-            badge: transactionsCount > 0 ? `${transactionsCount}` : null,
+            badge: userRole === 'staff_gudang'
+                ? (pendingInCount + pendingOutCount > 0 ? `${pendingInCount + pendingOutCount}` : null)
+                : (transactionsCount > 0 ? `${transactionsCount}` : null),
             badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300',
             roles: ['admin', 'manajer_gudang', 'staff_gudang'],
         },
@@ -100,11 +110,29 @@ export function FlowbiteSidebar({
         },
         {
             id: 'reports',
-            label: 'Laporan Mutasi',
+            label: userRole === 'manajer_gudang' ? 'Laporan Stok & Mutasi' : 'Laporan Gudang',
             icon: FileText,
             badge: null,
             roles: ['admin', 'manajer_gudang'],
         },
+        {
+            id: 'cash_flow',
+            label: userRole === 'staff_gudang' ? 'Kas Kecil Gudang' : 'Buku Kas / Arus Kas',
+            icon: Wallet,
+            badge: userRole === 'staff_gudang' ? 'Petty Cash' : 'Keuangan',
+            badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300',
+            roles: ['admin', 'manajer_gudang', 'staff_gudang'],
+        },
+
+        {
+            id: 'warehouse_notes',
+            label: 'Catatan Gudang',
+            icon: StickyNote,
+            badge: 'Baru',
+            badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300',
+            roles: ['admin', 'manajer_gudang', 'staff_gudang'],
+        },
+
         // Tab Khusus Customer (Pelanggan)
         {
             id: 'catalog',
@@ -128,7 +156,7 @@ export function FlowbiteSidebar({
             badge: null,
             roles: ['customer'],
         },
-        // Tab Manajemen Pesanan & Refund untuk Staff Gudang, Manajer, Admin
+        // Tab Manajemen Pesanan & Refund untuk Admin, Manajer, dan Staff Gudang
         {
             id: 'orders_management',
             label: 'Pesanan Customer',
@@ -149,7 +177,7 @@ export function FlowbiteSidebar({
             label: 'Manajemen User',
             icon: Users,
             badge: 'Admin',
-            badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+            badgeColor: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
             roles: ['admin'],
         },
         {
@@ -159,6 +187,13 @@ export function FlowbiteSidebar({
             badge: null,
             roles: ['admin'],
         },
+        {
+            id: 'profile',
+            label: 'Profil Saya',
+            icon: UserIcon,
+            badge: null,
+            roles: ['admin', 'manajer_gudang', 'staff_gudang', 'customer'],
+        },
     ];
 
     const visibleItems = allNavItems.filter(item => item.roles.includes(userRole));
@@ -166,11 +201,10 @@ export function FlowbiteSidebar({
     return (
         <aside
             id="logo-sidebar"
-            className={`fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 ease-in-out ${
-                isOpen 
-                    ? 'w-64 translate-x-0 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-lg md:shadow-none' 
-                    : '-translate-x-full md:translate-x-0 md:w-20 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700'
-            }`}
+            className={`fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 ease-in-out ${isOpen
+                ? 'w-64 translate-x-0 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-lg md:shadow-none'
+                : '-translate-x-full md:translate-x-0 md:w-20 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700'
+                }`}
             aria-label="Sidebar"
         >
             <div className="h-full px-3 pb-4 overflow-y-auto flex flex-col justify-between">
@@ -178,20 +212,33 @@ export function FlowbiteSidebar({
                     {/* Top Profile / Header Avatar */}
                     {isOpen ? (
                         <div className="px-2 mb-4 flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700/60">
-                            <div className="flex items-center gap-2.5">
-                                <div className="w-9 h-9 rounded-full bg-blue-50 text-[#3B5BFD] dark:bg-blue-900/40 dark:text-blue-300 font-bold flex items-center justify-center text-sm shadow-xs ring-2 ring-blue-100 dark:ring-blue-950">
-                                    {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-900 dark:text-white truncate max-w-[110px]">
+                            <button
+                                type="button"
+                                onClick={() => onSelectTab && onSelectTab('profile')}
+                                title="Buka Profil Saya"
+                                className="flex items-center gap-2.5 text-left cursor-pointer p-1 -m-1 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors flex-1 overflow-hidden group"
+                            >
+                                {currentUser?.avatar ? (
+                                    <img
+                                        src={currentUser.avatar}
+                                        alt={currentUser.name || 'User'}
+                                        className="w-9 h-9 rounded-full object-cover shadow-xs ring-2 ring-blue-100 dark:ring-blue-950 flex-shrink-0 group-hover:ring-blue-300 dark:group-hover:ring-blue-500 transition-all"
+                                    />
+                                ) : (
+                                    <div className="w-9 h-9 rounded-full bg-theme-primary-light text-theme-primary dark:bg-blue-900/40 dark:text-blue-300 font-bold flex items-center justify-center text-sm shadow-xs ring-2 ring-blue-100 dark:ring-blue-950 flex-shrink-0 group-hover:ring-blue-300 dark:group-hover:ring-blue-500 transition-all">
+                                        {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
+                                    </div>
+                                )}
+                                <div className="flex flex-col truncate">
+                                    <span className="text-xs font-bold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                         {currentUser?.name || 'User'}
                                     </span>
-                                    <span className="text-[10px] text-[#3B5BFD] dark:text-blue-400 capitalize font-medium flex items-center gap-1">
+                                    <span className="text-[10px] text-theme-primary dark:text-blue-400 capitalize font-medium flex items-center gap-1">
                                         <Shield className="w-2.5 h-2.5" />
                                         {userRole.replace('_', ' ')}
                                     </span>
                                 </div>
-                            </div>
+                            </button>
                             {onToggleSidebar && (
                                 <button
                                     type="button"
@@ -206,9 +253,24 @@ export function FlowbiteSidebar({
                         </div>
                     ) : (
                         <div className="flex flex-col items-center mb-5 pb-3 border-b border-gray-100 dark:border-gray-700/60">
-                            <div className="w-10 h-10 rounded-full bg-blue-50 text-[#3B5BFD] dark:bg-blue-900/40 dark:text-blue-300 font-bold flex items-center justify-center text-sm shadow-xs ring-2 ring-blue-100 dark:ring-blue-950">
-                                {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
-                            </div>
+                            <button
+                                type="button"
+                                onClick={() => onSelectTab && onSelectTab('profile')}
+                                title="Buka Profil Saya"
+                                className="cursor-pointer hover:scale-110 transition-transform"
+                            >
+                                {currentUser?.avatar ? (
+                                    <img
+                                        src={currentUser.avatar}
+                                        alt={currentUser.name || 'User'}
+                                        className="w-10 h-10 rounded-full object-cover shadow-xs ring-2 ring-blue-100 dark:ring-blue-950"
+                                    />
+                                ) : (
+                                    <div className="w-10 h-10 rounded-full bg-theme-primary-light text-theme-primary dark:bg-blue-900/40 dark:text-blue-300 font-bold flex items-center justify-center text-sm shadow-xs ring-2 ring-blue-100 dark:ring-blue-950">
+                                        {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
+                                    </div>
+                                )}
+                            </button>
                         </div>
                     )}
 
@@ -223,19 +285,16 @@ export function FlowbiteSidebar({
                                         type="button"
                                         onClick={() => onSelectTab && onSelectTab(item.id)}
                                         title={item.label}
-                                        className={`transition-all duration-150 cursor-pointer ${
-                                            !isOpen
-                                                ? `w-11 h-11 flex items-center justify-center rounded-xl relative ${
-                                                    isActive
-                                                        ? 'bg-[#3B5BFD] text-white shadow-md shadow-blue-500/30'
-                                                        : 'text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60'
-                                                }`
-                                                : `w-full flex items-center p-2.5 text-sm rounded-xl ${
-                                                    isActive
-                                                        ? 'bg-[#3B5BFD] text-white shadow-md shadow-blue-500/25 font-semibold'
-                                                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60'
-                                                }`
-                                        }`}
+                                        className={`transition-all duration-150 cursor-pointer ${!isOpen
+                                            ? `w-11 h-11 flex items-center justify-center rounded-xl relative ${isActive
+                                                ? 'bg-theme-primary text-white shadow-md shadow-md'
+                                                : 'text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60'
+                                            }`
+                                            : `w-full flex items-center p-2.5 text-sm rounded-xl ${isActive
+                                                ? 'bg-theme-primary text-white shadow-md shadow-md font-semibold'
+                                                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60'
+                                            }`
+                                            }`}
                                     >
                                         <Icon className="w-5 h-5 flex-shrink-0" />
                                         {isOpen && (
@@ -245,11 +304,10 @@ export function FlowbiteSidebar({
                                                 </span>
                                                 {item.badge && (
                                                     <span
-                                                        className={`inline-flex items-center justify-center px-2 py-0.5 ms-2 text-[10px] font-semibold rounded-full ${
-                                                            isActive
-                                                                ? 'bg-white/20 text-white'
-                                                                : item.badgeColor || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                                                        }`}
+                                                        className={`inline-flex items-center justify-center px-2 py-0.5 ms-2 text-[10px] font-semibold rounded-full ${isActive
+                                                            ? 'bg-white/20 text-white'
+                                                            : item.badgeColor || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                                                            }`}
                                                     >
                                                         {item.badge}
                                                     </span>

@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
     use HasFactory;
-
-    public $timestamps = false;
 
     protected $table = 'products';
 
@@ -25,12 +24,14 @@ class Product extends Model
         'selling_price',
         'image',
         'minimum_stock',
+        'zero_stock_since',
     ];
 
     protected $casts = [
         'purchase_price' => 'decimal:2',
         'selling_price' => 'decimal:2',
         'minimum_stock' => 'integer',
+        'zero_stock_since' => 'datetime',
     ];
 
     public function category(): BelongsTo
@@ -61,6 +62,27 @@ class Product extends Model
     public function feedbacks(): HasMany
     {
         return $this->hasMany(OrderFeedback::class, 'product_id');
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image) {
+            return null;
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'data:')) {
+            return $this->image;
+        }
+
+        if (str_starts_with($this->image, '/storage/')) {
+            return $this->image;
+        }
+
+        if (str_starts_with($this->image, 'storage/')) {
+            return '/'.$this->image;
+        }
+
+        return Storage::url($this->image);
     }
 
     public function getCurrentStockAttribute(): int

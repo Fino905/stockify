@@ -12,17 +12,23 @@ interface FlowbiteAdminLayoutProps {
         name: string;
         email: string;
         role: string;
+        avatar?: string | null;
     } | null;
     productsCount?: number;
     transactionsCount?: number;
     pendingInCount?: number;
     pendingOutCount?: number;
     isTabLoading?: boolean;
+    notifications?: any;
+    appSettings?: {
+        appName?: string;
+        logo?: string | null;
+    } | null;
 }
 
-export default function FlowbiteAdminLayout({ 
-    children, 
-    activeTab = 'dashboard', 
+export default function FlowbiteAdminLayout({
+    children,
+    activeTab = 'dashboard',
     onSelectTab,
     currentUser,
     productsCount = 0,
@@ -30,6 +36,8 @@ export default function FlowbiteAdminLayout({
     pendingInCount = 0,
     pendingOutCount = 0,
     isTabLoading = false,
+    notifications,
+    appSettings,
 }: FlowbiteAdminLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [isPageLoading, setIsPageLoading] = useState(false);
@@ -70,48 +78,55 @@ export default function FlowbiteAdminLayout({
         <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans antialiased text-gray-900 dark:text-gray-100 relative">
             {/* Top Minimalist Page Loading Bar */}
             {showLoader && (
-                <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-gray-200 dark:bg-gray-800 overflow-hidden">
-                    <div className="h-full bg-[#43637E] dark:bg-[#4EE3D6] animate-progress-flow rounded-full" />
+                <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-gray-200 dark:bg-gray-800 overflow-hidden print:hidden">
+                    <div className="h-full bg-blue-600 dark:bg-blue-400 animate-progress-flow rounded-full" />
                 </div>
             )}
 
             {/* Top Fixed Flowbite Navbar */}
-            <FlowbiteNavbar 
-                sidebarOpen={sidebarOpen}
-                onToggleSidebar={toggleSidebar}
-                currentUser={currentUser}
-            />
+            <div className="print:hidden">
+                <FlowbiteNavbar
+                    sidebarOpen={sidebarOpen}
+                    onToggleSidebar={toggleSidebar}
+                    currentUser={currentUser}
+                    onSelectTab={onSelectTab}
+                    notifications={notifications}
+                    appSettings={appSettings}
+                />
+            </div>
 
             {/* Backdrop for mobile */}
             {sidebarOpen && (
-                <div 
+                <div
                     onClick={() => setSidebarOpen(false)}
-                    className="fixed inset-0 z-30 bg-gray-900/50 dark:bg-gray-900/80 md:hidden backdrop-blur-xs"
+                    className="fixed inset-0 z-30 bg-gray-900/50 dark:bg-gray-900/80 md:hidden backdrop-blur-xs print:hidden"
                 />
             )}
 
             {/* Left Fixed Flowbite Sidebar */}
-            <FlowbiteSidebar 
-                isOpen={sidebarOpen}
-                onToggleSidebar={toggleSidebar}
-                activeTab={activeTab}
-                onSelectTab={(tab) => {
-                    if (onSelectTab) onSelectTab(tab);
-                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                        setSidebarOpen(false);
-                    }
-                }}
-                userRole={currentUser?.role ?? 'admin'}
-                currentUser={currentUser}
-                productsCount={productsCount}
-                transactionsCount={transactionsCount}
-                pendingInCount={pendingInCount}
-                pendingOutCount={pendingOutCount}
-            />
+            <div className="print:hidden">
+                <FlowbiteSidebar
+                    isOpen={sidebarOpen}
+                    onToggleSidebar={toggleSidebar}
+                    activeTab={activeTab}
+                    onSelectTab={(tab) => {
+                        if (onSelectTab) onSelectTab(tab);
+                        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                            setSidebarOpen(false);
+                        }
+                    }}
+                    userRole={currentUser?.role ?? 'admin'}
+                    currentUser={currentUser}
+                    productsCount={productsCount}
+                    transactionsCount={transactionsCount}
+                    pendingInCount={pendingInCount}
+                    pendingOutCount={pendingOutCount}
+                />
+            </div>
 
             {/* Main Content Area with fluid width when sidebar is toggled */}
-            <main className={`p-4 md:p-6 pt-20 transition-[margin] duration-300 ease-in-out ${sidebarOpen ? 'md:ml-64' : 'md:ml-20 ml-0'}`}>
-                <div className="max-w-7xl mx-auto space-y-6">
+            <main className={`px-4 md:px-6 pb-6 md:pb-8 pt-24 md:pt-24 print:pt-0 print:pb-0 print:px-0 print:m-0 print:ml-0 transition-[margin] duration-300 ease-in-out ${sidebarOpen ? 'md:ml-64 print:ml-0' : 'md:ml-20 ml-0 print:ml-0'}`}>
+                <div className="max-w-7xl mx-auto space-y-6 print:max-w-full print:space-y-4">
                     {children}
                 </div>
             </main>

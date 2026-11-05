@@ -9,8 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Tambahkan 'customer' ke ENUM role pada tabel users
-        DB::statement("ALTER TABLE `users` MODIFY COLUMN `role` ENUM('admin', 'manajer_gudang', 'staff_gudang', 'customer') NOT NULL DEFAULT 'staff_gudang'");
+        // 1. Tambahkan 'customer' ke ENUM role pada tabel users (khusus MySQL)
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE `users` MODIFY COLUMN `role` ENUM('admin', 'manajer_gudang', 'staff_gudang', 'customer') NOT NULL DEFAULT 'staff_gudang'");
+        }
 
         // 2. Tabel orders
         if (! Schema::hasTable('orders')) {
@@ -80,6 +82,8 @@ return new class extends Migration
         Schema::dropIfExists('order_feedbacks');
         Schema::dropIfExists('orders');
 
-        DB::statement("ALTER TABLE `users` MODIFY COLUMN `role` ENUM('admin', 'manajer_gudang', 'staff_gudang') NOT NULL DEFAULT 'staff_gudang'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE `users` MODIFY COLUMN `role` ENUM('admin', 'manajer_gudang', 'staff_gudang') NOT NULL DEFAULT 'staff_gudang'");
+        }
     }
 };

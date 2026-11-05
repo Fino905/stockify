@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\Teams\CreateTeam;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderFeedback;
@@ -38,6 +39,17 @@ class StockifySeeder extends Seeder
             ]
         );
 
+        // Alias email untuk manajer
+        $managerAlias = User::firstOrCreate(
+            ['email' => 'manager@stockify.test'],
+            [
+                'name' => 'Budi Santoso (Manager)',
+                'password' => Hash::make('password'),
+                'role' => 'manajer_gudang',
+                'email_verified_at' => now(),
+            ]
+        );
+
         $staff = User::firstOrCreate(
             ['email' => 'staff@stockify.test'],
             [
@@ -58,30 +70,64 @@ class StockifySeeder extends Seeder
             ]
         );
 
+        // Buat tim personal untuk setiap user demo jika belum memiliki
+        $createTeam = app(CreateTeam::class);
+        foreach ([$admin, $manajer, $managerAlias, $staff, $customer] as $u) {
+            if (! $u->current_team_id) {
+                $team = $createTeam->handle($u, $u->name."'s Team", isPersonal: true);
+                $u->update(['current_team_id' => $team->id]);
+            }
+        }
+
         // 2. Kategori Produk Awal
-        $cat1 = Category::firstOrCreate(['name' => 'Bahan Baku & Material'], ['description' => 'Logam, besi, plat, dan material mentah pabrik']);
-        $cat2 = Category::firstOrCreate(['name' => 'Perkakas & Baut'], ['description' => 'Baut, mur, mata bor, dan perkakas instalasi']);
+        $cat1 = Category::firstOrCreate(['name' => 'Bahan Baku & Material'], ['description' => 'Logam, besi, plat, kayu, dan material mentah pabrik']);
+        $cat2 = Category::firstOrCreate(['name' => 'Peralatan & Perkakas'], ['description' => 'Peralatan teknik, pertukangan, mesin, dan baut']);
         $cat3 = Category::firstOrCreate(['name' => 'Elektronik & Kelistrikan'], ['description' => 'Kabel, trafo, breaker, dan komponen panel']);
         $cat4 = Category::firstOrCreate(['name' => 'Perlengkapan K3'], ['description' => 'Helm, sarung tangan, kacamata pelindung']);
+        $cat5 = Category::firstOrCreate(['name' => 'Kendaraan & Otomotif'], ['description' => 'Kendaraan, spare part, ban, oli mesin, dan onderdil motor/mobil']);
+        $cat6 = Category::firstOrCreate(['name' => 'Sayur & Bahan Pangan'], ['description' => 'Sayuran segar, sayur mayur, buah, dan komoditas pangan gudang']);
 
-        // 3. Supplier Awal
+        // 3. Supplier Awal (Dilengkapi spesialisasi kategori komoditas)
         $sup1 = Supplier::firstOrCreate(['name' => 'PT Sinar Abadi Logam'], [
+            'category_id' => $cat1->id,
             'address' => 'Jl. Industri Baja No. 45, Cikarang',
             'phone' => '021-8976543',
             'email' => 'sales@sinarabadi.test',
         ]);
+        if (! $sup1->category_id) {
+            $sup1->update(['category_id' => $cat1->id]);
+        }
 
         $sup2 = Supplier::firstOrCreate(['name' => 'CV Mitra Perkakas Jaya'], [
+            'category_id' => $cat2->id,
             'address' => 'Kawasan Pergudangan Margomulyo Blok C-12, Surabaya',
             'phone' => '031-7654321',
             'email' => 'order@mitraperkakas.test',
         ]);
+        if (! $sup2->category_id) {
+            $sup2->update(['category_id' => $cat2->id]);
+        }
 
         $sup3 = Supplier::firstOrCreate(['name' => 'PT Surya Elektrik Nusantara'], [
+            'category_id' => $cat3->id,
             'address' => 'Jl. Soekarno Hatta No. 88, Bandung',
             'phone' => '022-7312345',
             'email' => 'info@suryaelektrik.test',
         ]);
+        if (! $sup3->category_id) {
+            $sup3->update(['category_id' => $cat3->id]);
+        }
+
+        // Supplier khusus Kendaraan & Otomotif (Honda hanya menerima/menyediakan motor & onderdil otomotif)
+        $supHonda = Supplier::firstOrCreate(['name' => 'PT Astra Honda Motor'], [
+            'category_id' => $cat5->id,
+            'address' => 'Jl. Laksda Yos Sudarso, Sunter 1, Jakarta Utara',
+            'phone' => '021-6518080',
+            'email' => 'corporate@ahm.honda.test',
+        ]);
+        if (! $supHonda->category_id) {
+            $supHonda->update(['category_id' => $cat5->id]);
+        }
 
         // 4. Produk Awal
         $prd1 = Product::firstOrCreate(['sku' => 'PRD-BAUT-001'], [
@@ -226,5 +272,8 @@ class StockifySeeder extends Seeder
                 'status' => 'pending',
             ]);
         }
+
+        // 7. 50 Produk Berbagai Kategori dan 10 Supplier Baru
+        $this->call(FiftyProductsAndTenSuppliersSeeder::class);
     }
 }

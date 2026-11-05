@@ -2,7 +2,8 @@ import React from 'react';
 import { 
     CheckSquare, 
     ArrowDownToLine, 
-    ArrowUpFromLine 
+    ArrowUpFromLine,
+    Check
 } from 'lucide-react';
 
 export interface PendingTaskItem {
@@ -28,7 +29,7 @@ export function StaffTaskOverview({
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header Ringkasan Tugas Operasional */}
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl dark:bg-blue-900/30 dark:border-blue-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+            <div className="card-lift-sm p-4 bg-blue-50 border border-blue-200 rounded-2xl dark:bg-blue-900/30 dark:border-blue-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs scroll-reveal">
                 <div className="flex items-center gap-3">
                     <div className="p-2.5 bg-blue-600 text-white rounded-xl shadow-xs shrink-0">
                         <CheckSquare className="w-5 h-5" />
@@ -54,7 +55,7 @@ export function StaffTaskOverview({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Tugas 1: Barang Masuk yang Perlu Diperiksa */}
-                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-5">
+                <div className="card-lift bg-white border border-gray-100 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-5 scroll-reveal scroll-reveal-left">
                     <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700 mb-4">
                         <div className="flex items-center gap-2">
                             <div className="p-2 bg-emerald-100 text-emerald-600 rounded-xl dark:bg-emerald-900/50 dark:text-emerald-300">
@@ -74,7 +75,7 @@ export function StaffTaskOverview({
                             pendingInTasks.map((task) => (
                                 <div 
                                     key={task.id} 
-                                    className="p-3.5 bg-gray-50/80 dark:bg-gray-750 rounded-xl border border-gray-100 dark:border-gray-700 flex items-center justify-between gap-3 transition-colors hover:bg-gray-100/60"
+                                    className="card-lift-sm p-3.5 bg-gray-50/80 dark:bg-gray-750 rounded-xl border border-gray-100 dark:border-gray-700 flex items-center justify-between gap-3 transition-colors hover:bg-gray-100/60"
                                 >
                                     <div>
                                         <div className="font-semibold text-gray-900 dark:text-white text-xs">
@@ -90,9 +91,11 @@ export function StaffTaskOverview({
                                     <button
                                         type="button"
                                         onClick={() => onConfirmTask(task.raw_id)}
-                                        className="px-3.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-all cursor-pointer shrink-0"
+                                        className="btn-press px-3.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-all cursor-pointer shrink-0 inline-flex items-center gap-1.5"
+                                        title="Tandai barang masuk sudah diperiksa kondisi fisiknya"
                                     >
-                                        ✓ Konfirmasi Masuk
+                                        <Check className="w-3.5 h-3.5" />
+                                        <span>Tandai Diperiksa</span>
                                     </button>
                                 </div>
                             ))
@@ -105,7 +108,7 @@ export function StaffTaskOverview({
                 </div>
 
                 {/* Tugas 2: Barang Keluar yang Perlu Disiapkan */}
-                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-5">
+                <div className="card-lift bg-white border border-gray-100 rounded-2xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-5 scroll-reveal scroll-reveal-right">
                     <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700 mb-4">
                         <div className="flex items-center gap-2">
                             <div className="p-2 bg-indigo-100 text-indigo-600 rounded-xl dark:bg-indigo-900/50 dark:text-indigo-300">
@@ -125,7 +128,7 @@ export function StaffTaskOverview({
                             pendingOutTasks.map((task) => (
                                 <div 
                                     key={task.id} 
-                                    className="p-3.5 bg-gray-50/80 dark:bg-gray-750 rounded-xl border border-gray-100 dark:border-gray-700 flex items-center justify-between gap-3 transition-colors hover:bg-gray-100/60"
+                                    className="card-lift-sm p-3.5 bg-gray-50/80 dark:bg-gray-750 rounded-xl border border-gray-100 dark:border-gray-700 flex items-center justify-between gap-3 transition-colors hover:bg-gray-100/60"
                                 >
                                     <div>
                                         <div className="font-semibold text-gray-900 dark:text-white text-xs">
@@ -141,9 +144,11 @@ export function StaffTaskOverview({
                                     <button
                                         type="button"
                                         onClick={() => onConfirmTask(task.raw_id)}
-                                        className="px-3.5 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition-all cursor-pointer shrink-0"
+                                        className="btn-press px-3.5 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition-all cursor-pointer shrink-0 inline-flex items-center gap-1.5"
+                                        title="Tandai barang keluar sudah disiapkan untuk pengiriman"
                                     >
-                                        ✓ Konfirmasi Siap Kirim
+                                        <Check className="w-3.5 h-3.5" />
+                                        <span>Tandai Disiapkan</span>
                                     </button>
                                 </div>
                             ))

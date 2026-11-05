@@ -13,11 +13,12 @@ return new class extends Migration
     {
         if (! Schema::hasTable('users')) {
             Schema::create('users', function (Blueprint $table) {
-                $table->id();
+                $table->increments('id');
                 $table->string('name');
                 $table->string('email')->unique();
                 $table->timestamp('email_verified_at')->nullable();
                 $table->string('password');
+                $table->enum('role', ['admin', 'manajer_gudang', 'staff_gudang', 'customer'])->default('staff_gudang');
                 $table->rememberToken();
                 $table->timestamps();
             });
@@ -46,7 +47,7 @@ return new class extends Migration
         if (! Schema::hasTable('sessions')) {
             Schema::create('sessions', function (Blueprint $table) {
                 $table->string('id')->primary();
-                $table->foreignId('user_id')->nullable()->index();
+                $table->unsignedInteger('user_id')->nullable()->index();
                 $table->string('ip_address', 45)->nullable();
                 $table->text('user_agent')->nullable();
                 $table->longText('payload');

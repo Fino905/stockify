@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Product;
 use App\Models\StockTransaction;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Repositories\Contracts\StockTransactionRepositoryInterface;
@@ -44,12 +45,23 @@ class StockTransactionService
         $data['user_id'] = $userId ?? 1;
         $data['status'] = $status;
 
-        return $this->transactionRepository->create($data);
+        $created = $this->transactionRepository->create($data);
+
+        if ($status === 'completed') {
+            $this->syncProductZeroStock($product);
+        }
+
+        return $created;
     }
 
     public function updateStatus(StockTransaction $transaction, string $status): bool
     {
-        return $this->transactionRepository->updateStatus($transaction, $status);
+        $updated = $this->transactionRepository->updateStatus($transaction, $status);
+        if ($transaction->product) {
+            $this->syncProductZeroStock($transaction->product);
+        }
+
+        return $updated;
     }
 
     public function confirmTransaction(StockTransaction $transaction, ?int $userId = null): bool
@@ -64,7 +76,12 @@ class StockTransactionService
             }
         }
 
-        return $this->transactionRepository->updateStatus($transaction, 'completed', $userId);
+        $confirmed = $this->transactionRepository->updateStatus($transaction, 'completed', $userId);
+        if ($transaction->product) {
+            $this->syncProductZeroStock($transaction->product);
+        }
+
+        return $confirmed;
     }
 
     /**
@@ -83,6 +100,8 @@ class StockTransactionService
         $diff = $physicalStock - $current;
 
         if ($diff === 0) {
+            $this->syncProductZeroStock($product);
+
             return [
                 'success' => true,
                 'diff' => 0,
@@ -105,11 +124,35 @@ class StockTransactionService
             ]);
         });
 
+        $this->syncProductZeroStock($product);
+
         return [
             'success' => true,
             'diff' => $diff,
             'message' => "Stock opname berhasil! Stok {$product->name} disesuaikan menjadi {$physicalStock} unit.",
         ];
+    }
+
+    /**
+     * Sinkronisasi penanda waktu stok nol produk
+     */
+    protected function syncProductZeroStock(Product $product): void
+    {
+        $freshProduct = $product->fresh();
+        if (! $freshProduct) {
+            return;
+        }
+
+        $stock = $freshProduct->current_stock;
+        if ($stock <= 0) {
+            if (! $freshProduct->zero_stock_since) {
+                $freshProduct->update(['zero_stock_since' => now()]);
+            }
+        } else {
+            if ($freshProduct->zero_stock_since !== null) {
+                $freshProduct->update(['zero_stock_since' => null]);
+            }
+        }
     }
 
     /**

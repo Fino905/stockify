@@ -34,7 +34,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property-read Collection<int, Membership> $teamMemberships
  * @property-read Collection<int, Team> $teams
  */
-#[Fillable(['name', 'email', 'password', 'role', 'current_team_id'])]
+#[Fillable(['name', 'email', 'password', 'role', 'current_team_id', 'avatar'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -53,5 +53,14 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    public function getAvatarAttribute(?string $value): ?string
+    {
+        if ($value) {
+            return asset($value);
+        }
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=321E48&color=fff';
     }
 }

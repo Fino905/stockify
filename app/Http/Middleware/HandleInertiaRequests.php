@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,10 +37,12 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $appSettings = Setting::getAppSettings();
 
         return [
             ...parent::share($request),
-            'name' => config('app.name'),
+            'name' => $appSettings['appName'] ?? config('app.name'),
+            'appSettings' => $appSettings,
             'auth' => [
                 'user' => $user,
             ],
