@@ -723,13 +723,37 @@
         margin: 12mm 15mm 15mm 15mm;
     }
 
-    /* Sembunyikan elemen non-cetak (navigasi, tombol, sidebar, dialog dll) */
+    /* Reset semua animasi & transisi layar saat dicetak agar tidak stuck di opacity 0 */
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+    }
+
+    .animate-in,
+    .fade-in,
+    .fade-in-50,
+    .zoom-in-95,
+    .scroll-reveal,
+    .scroll-reveal-left,
+    .scroll-reveal-right,
+    .scroll-reveal-scale {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
+    }
+
+    /* Sembunyikan elemen non-cetak (navigasi, tombol, sidebar, dialog dll) dan lepas dari layout */
     nav,
     aside,
     header,
     footer,
     .no-print,
     .print\:hidden,
+    .print\:hidden *,
     button,
     select,
     input,
@@ -737,25 +761,40 @@
     .backdrop-blur-xs,
     .live-beacon {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
     }
 
     /* Tampilkan elemen khusus cetak (kop surat, lembar pengesahan tanda tangan) */
     .print-only,
     .print\:block {
         display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .print\:flex {
         display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .print\:grid {
         display: grid !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     /* Format kertas putih bersih */
     html, body {
         background: #ffffff !important;
+        background-color: #ffffff !important;
         color: #111827 !important;
         font-size: 9.5pt !important;
         line-height: 1.35 !important;
@@ -763,6 +802,7 @@
         padding: 0 !important;
         width: 100% !important;
         height: auto !important;
+        min-height: 0 !important;
         overflow: visible !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -771,16 +811,18 @@
     /* Kontainer utama mengambil 100% lebar kertas tanpa margin sidebar */
     main {
         margin: 0 !important;
+        margin-left: 0 !important;
         padding: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
+        position: static !important;
     }
 
     main > div {
         margin: 0 !important;
         padding: 0 !important;
         max-width: 100% !important;
-        space-y: 0 !important;
+        width: 100% !important;
     }
 
     /* Lepaskan overflow scroll agar tabel tidak terpotong dan bisa terbagi ke halaman berikutnya */
@@ -789,13 +831,14 @@
     .overflow-hidden {
         overflow: visible !important;
         max-height: none !important;
+        height: auto !important;
     }
 
     /* Format Tabel Resmi */
     table {
         width: 100% !important;
         border-collapse: collapse !important;
-        margin-top: 10px !important;
+        margin-top: 8px !important;
         margin-bottom: 12px !important;
         page-break-inside: auto !important;
     }
@@ -818,19 +861,20 @@
         padding: 4px 6px !important;
         color: #111827 !important;
         background: transparent !important;
+        font-size: 8.5pt !important;
     }
 
     th {
         background-color: #f3f4f6 !important;
         font-weight: 700 !important;
         text-transform: uppercase !important;
-        font-size: 8.5pt !important;
     }
 
     /* Hilangkan shadow & efek layar */
-    .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-xs, .card-lift {
+    .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-xs, .card-lift, .card-lift-sm {
         box-shadow: none !important;
         border: 1px solid #e5e7eb !important;
+        transform: none !important;
     }
 
     .rounded-xl, .rounded-2xl {

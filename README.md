@@ -32,36 +32,29 @@
 
 ## 🌟 Tentang Stockify
 
-**Stockify** adalah platform manajemen persediaan barang (inventory) dan transaksi gudang terpadu yang menjembatani operasional internal gudang dengan kebutuhan belanja pelanggan (*customer*). 
+**Stockify** adalah platform manajemen persediaan barang (*inventory management system*) dan transaksi gudang terpadu untuk operasional internal pergudangan modern. 
 
-Dibangun dengan arsitektur modern berbasis **Single Page Application (SPA)** menggunakan **Inertia.js** dan **React 19**, Stockify menawarkan performa cepat tanpa reload halaman, visual antarmuka elegan bertema *Unified Royal Blue* (`#3B5BFD`), dan kontrol hak akses multi-peran (*Role-Based Access Control*).
+Dibangun dengan arsitektur modern berbasis **Single Page Application (SPA)** menggunakan **Inertia.js** dan **React 19**, Stockify menawarkan performa cepat tanpa reload halaman, visual antarmuka elegan bertema *Unified Royal Blue* (`#3B5BFD`), dan kontrol hak akses berbasis peran (*Role-Based Access Control*) untuk 3 level peran: **Admin**, **Manajer Gudang**, dan **Staff Gudang**.
 
 ---
 
 ## ✨ Fitur Utama
 
 ### 👑 1. Portal Admin & Manajer Gudang
-- **Executive Analytics Dashboard**: Metrik perputaran stok (*turnover rate*), total nilai aset gudang, SKU hampir habis (*low-stock alerts*), dan tren pesanan.
-- **Order & Transaction Review**: Pemantauan pesanan pelanggan secara langsung dan riwayat transaksi barang masuk/keluar (*Stock In / Stock Out*).
-- **Refund Management**: Verifikasi permohonan pengembalian dana (*refund*) dari pelanggan dengan opsi persetujuan (*Approve*) atau penolakan (*Reject*) disertai alasan.
-- **Supplier & Category Management**: Manajemen pemasok mitra dan kategori produk.
+- **Executive Analytics Dashboard**: Metrik perputaran stok (*turnover rate*), total nilai aset gudang, SKU hampir habis (*low-stock alerts*), dan tren mutasi barang.
+- **Cash Flow & Financial Tracking**: Rekap arus kas operasional gudang, modal awal, biaya packing/utilitas, dan pembayaran supplier.
+- **Supplier & Category Management**: Manajemen pemasok mitra dan master kategori produk.
+- **User & Access Control**: Manajemen akun internal pergudangan dengan penetapan hak akses terperinci.
 
-### 📦 2. Portal Staff Gudang (Petugas)
+### 📦 2. Portal Staff Gudang (Petugas Logistik)
 - **Task Center**: Pusat tugas harian petugas gudang untuk memproses verifikasi barang masuk dan pengeluaran pesanan.
-- **Inventory Control**: Pembaruan stok instan saat barang diterima dari supplier atau saat dipersiapkan untuk pengiriman.
-- **Product Management**: Pengelolaan data produk dan varian atribut barang.
+- **Inventory Control**: Pembaruan stok instan saat barang diterima dari supplier atau saat dipersiapkan untuk pengiriman logistik.
+- **Product Management**: Pengelolaan data produk, SKU, kategori, dan varian atribut barang.
+- **Warehouse Notes & Opname**: Catatan internal gudang dan rekonsiliasi stok fisik.
 
-### 🛒 3. Portal Customer (Katalog & Belanja)
-- **Direct Catalog Browsing**: Penjelajahan katalog produk responsif dengan filter pencarian, indikator ketersediaan stok, dan foto produk.
-- **Automated Stock Deduction**: Stok barang di gudang otomatis berkurang secara konsisten setiap kali pesanan berhasil dilakukan.
-- **Interactive Dummy Payment Simulation**: Modal simulasi pembayaran (Virtual Account, QRIS, Transfer Bank) yang aman untuk pengujian alur *checkout* tanpa gateway finansial riil.
-- **Order Tracking & History**: Pelacakan status pesanan pelanggan (*pending, diproses, dikirim, selesai*).
-- **Ratings & Feedback**: Pelanggan dapat memberikan ulasan bintang (1–5) dan komentar ulasan produk setelah transaksi.
-- **Refund Request**: Pengajuan komplain/refund barang rusak atau tidak sesuai dengan input bukti dan alasan.
-
-### 🔐 4. Autentikasi & Keamanan (RBAC)
-- **Restricted Public Registration**: Formulir registrasi publik dikunci otomatis khusus untuk pendaftaran role **Customer**, mencegah eskalasi hak akses internal.
-- **Fortify & Middleware Guard**: Proteksi rute tingkat controller dan middleware berbasis peran pengguna (`admin`, `manajer_gudang`, `staff_gudang`, `customer`).
+### 🔐 3. Autentikasi & Keamanan (RBAC)
+- **Role-Based Access Control**: Proteksi rute tingkat controller dan middleware berbasis peran pengguna (`admin`, `manajer_gudang`, `staff_gudang`).
+- **Audit & Security**: Proteksi sesi, password hashing terstandar, dan pembatasan wewenang ketat antar peran.
 
 ---
 
@@ -86,10 +79,9 @@ Database seeder telah dilengkapi dengan akun pengujian untuk setiap tingkatan pe
 
 | Peran (Role) | Email | Akses Halaman Utama |
 | :--- | :--- | :--- |
-| **Admin** | `admin@stockify.test` | Full Dashboard, Analytics, Refund & Order Approvals |
-| **Manajer Gudang** | `manajer@stockify.test` | Dashboard Operasional & Laporan Stok |
-| **Staff Gudang** | `staff@stockify.test` | Task Center, Verifikasi Barang Masuk/Keluar |
-| **Customer** | `customer@stockify.test` | Langsung ke Katalog Belanja, Pesanan, Feedback & Refund |
+| **Admin** | `admin@stockify.test` | Full Dashboard, Analytics, Pengaturan, & Manajemen Akun |
+| **Manajer Gudang** | `manajer@stockify.test` | Dashboard Operasional, Analisis Stok, & Laporan Gudang |
+| **Staff Gudang** | `staff@stockify.test` | Task Center, Verifikasi Barang Masuk & Barang Keluar |
 
 ---
 
@@ -156,22 +148,22 @@ Buka peramban Anda di [http://127.0.0.1:8000](http://127.0.0.1:8000).
 stockify/
 ├── app/
 │   ├── Actions/Fortify/           # Aksi registrasi & autentikasi pengguna
-│   ├── Http/Controllers/          # Controller (DashboardController, CatalogController, dll.)
-│   ├── Models/                   # Model Eloquent (Product, Order, OrderFeedback, OrderRefund, dll.)
-│   └── Services/                 # Business logic terisolasi (DashboardService.php)
+│   ├── Http/Controllers/          # Controller (Dashboard, User, Setting, QuickSwitch, dll.)
+│   ├── Models/                   # Model Eloquent (Product, Supplier, Category, StockTransaction, CashTransaction)
+│   └── Services/                 # Business logic terisolasi (DashboardService, ProductService)
 ├── database/
 │   ├── migrations/               # Skema tabel database
-│   └── seeders/                  # StockifySeeder dengan data simulasi lengkap
+│   └── seeders/                  # StockifySeeder dengan data simulasi gudang
 ├── resources/
 │   ├── css/                      # Konfigurasi Tailwind CSS v4
 │   └── js/
 │       ├── components/
 │       │   ├── dashboard/
 │       │   │   ├── admin/       # Modul Analytics & Overview Admin
-│       │   │   ├── staff/       # Modul Task Center & Gudang Staff
-│       │   │   └── customer/    # Modul Katalog, Pesanan & Refund Pelanggan
+│       │   │   ├── manager/     # Modul Monitoring Stok & Evaluasi Manajer Gudang
+│       │   │   └── staff/       # Modul Task Center & Operasional Gudang Staff
 │       │   └── flowbite/        # Navbar & Sidebar responsif
-│       ├── layouts/              # AppLayout & AuthLayout
+│       ├── layouts/              # AppLayout & FlowbiteAdminLayout
 │       └── pages/                # Halaman Inertia (dashboard.tsx, welcome.tsx, auth/)
 └── routes/
     └── web.php                   # Routing web & proteksi middleware
@@ -195,5 +187,5 @@ Kontribusi selalu diterima dengan tangan terbuka!
 Projek ini didistribusikan di bawah lisensi open-source **[MIT License](LICENSE)**.
 
 <div align="center">
-  <sub>Dibangun dengan dedikasi untuk efisiensi manajemen persediaan dan kepuasan pelanggan.</sub>
+  <sub>Dibangun dengan dedikasi untuk efisiensi manajemen persediaan dan operasional logistik gudang.</sub>
 </div>

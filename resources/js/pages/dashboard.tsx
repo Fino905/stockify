@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import FlowbiteAdminLayout from '@/layouts/flowbite-admin-layout';
-import {
-    CustomerCatalog,
-    CustomerOrdersTab,
-    CustomerRefundsTab,
-    AdminOrdersTab,
-    AdminRefundsTab
-} from '@/components/dashboard/customer';
 import { StaffTaskOverview } from '@/components/dashboard/staff';
 import { ManagerStockOverview } from '@/components/dashboard/manager';
 import { AdminAnalyticsOverview } from '@/components/dashboard/admin';
 import { WarehouseNotesTab } from '@/components/dashboard/warehouse-notes-tab';
 import { CashFlowTab } from '@/components/dashboard/cash-flow-tab';
 import { ProfileTab } from '@/components/dashboard/profile-tab';
+import { ConfirmAlertModal } from '@/components/common/confirm-alert-modal';
+import { triggerAlertToast } from '@/components/common/alert-toast-banner';
 import {
     Boxes,
     ArrowDownToLine,
@@ -217,21 +212,17 @@ export default function Dashboard({
             if (tabParam) return tabParam;
 
             const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-            if (['products', 'categories', 'suppliers', 'transactions', 'opname', 'reports', 'users', 'settings', 'catalog', 'my_orders', 'my_refunds', 'profile', 'warehouse_notes', 'orders_management', 'refunds_management', 'sales', 'cash_flow', 'cash-flow'].includes(path)) {
-                if (path === 'sales') return 'orders_management';
+            if (['products', 'categories', 'suppliers', 'transactions', 'opname', 'reports', 'users', 'settings', 'profile', 'warehouse_notes', 'cash_flow', 'cash-flow'].includes(path)) {
                 if (path === 'cash-flow') return 'cash_flow';
                 return path;
             }
-            if (path === 'admin/refunds') return 'refunds_management';
         }
-        return userRole === 'customer' ? 'catalog' : 'dashboard';
+        return 'dashboard';
     });
     const [isTabLoading, setIsTabLoading] = useState(false);
 
     React.useEffect(() => {
-        if (userRole === 'customer' && !['catalog', 'my_orders', 'my_refunds', 'profile'].includes(activeTab)) {
-            setActiveTab('catalog');
-        } else if (userRole === 'staff_gudang' && !['dashboard', 'transactions', 'warehouse_notes', 'orders_management', 'refunds_management', 'cash_flow', 'profile'].includes(activeTab)) {
+        if (userRole === 'staff_gudang' && !['dashboard', 'transactions', 'warehouse_notes', 'cash_flow', 'profile'].includes(activeTab)) {
             setActiveTab('dashboard');
         } else if (userRole === 'manajer_gudang' && ['categories', 'users', 'settings'].includes(activeTab)) {
             setActiveTab('dashboard');
@@ -282,6 +273,35 @@ export default function Dashboard({
     const [transactionType, setTransactionType] = useState<'in' | 'out'>('in');
     const [showUserModal, setShowUserModal] = useState(false);
     const [showOpnameModal, setShowOpnameModal] = useState(false);
+
+    // Modal Alert Konfirmasi Transaksi / Mutasi Stok Produk
+    const [taskToConfirm, setTaskToConfirm] = useState<{
+        id: number;
+        productName: string;
+        sku?: string;
+        quantity: number;
+        type: 'in' | 'out';
+        action: 'prepare' | 'confirm' | 'reject';
+    } | null>(null);
+    const [isProcessingTask, setIsProcessingTask] = useState(false);
+
+    // Modal Alert Konfirmasi Hapus Data (Produk, Kategori, Supplier, Pengguna)
+    const [itemToDelete, setItemToDelete] = useState<{
+        url: string;
+        title: string;
+        name: string;
+        categoryTitle: string;
+        badge?: string;
+        message: string;
+        fields?: Array<{ label: string; value: string | number; isHighlight?: boolean }>;
+    } | null>(null);
+    const [isDeletingItem, setIsDeletingItem] = useState(false);
+
+    // Modal Alert Konfirmasi Reset Pengaturan & Bersihkan Stok Kosong
+    const [showResetSettingsConfirm, setShowResetSettingsConfirm] = useState(false);
+    const [isResettingSettings, setIsResettingSettings] = useState(false);
+    const [showCleanZeroStockConfirm, setShowCleanZeroStockConfirm] = useState(false);
+    const [isCleaningZeroStock, setIsCleaningZeroStock] = useState(false);
     const [showAttributeModal, setShowAttributeModal] = useState(false);
     const [selectedProductForAttr, setSelectedProductForAttr] = useState<number | null>(null);
     const [selectedProductDetail, setSelectedProductDetail] = useState<any | null>(null);
@@ -665,6 +685,7 @@ export default function Dashboard({
                     window.dispatchEvent(new CustomEvent('app_settings_changed', { detail: updated }));
                 }
                 setSettingsSavedMessage('Pengaturan aplikasi & logo Stockify berhasil disimpan ke sistem dan database!');
+                triggerAlertToast('Pengaturan aplikasi & logo Stockify berhasil disimpan!', 'success');
                 setTimeout(() => setSettingsSavedMessage(null), 4000);
             },
             onError: () => {
@@ -674,33 +695,43 @@ export default function Dashboard({
                     window.dispatchEvent(new CustomEvent('app_settings_changed', { detail: appSettings }));
                 }
                 setSettingsSavedMessage('Pengaturan berhasil diperbarui di browser!');
+                triggerAlertToast('Pengaturan diperbarui di browser lokal.', 'info');
                 setTimeout(() => setSettingsSavedMessage(null), 4000);
             },
         });
     };
 
     const handleResetSettings = () => {
-        if (confirm('Kembalikan logo dan pengaturan ke setelan awal Stockify?')) {
-            const defaults = {
-                appName: 'Stockify',
-                warehouseName: 'Gudang Pusat Logistik Cikarang',
-                contact: '021-8976500',
-                email: 'admin@stockify.test',
-                address: 'Kawasan Industri GIIC Blok AA No. 1, Cikarang Pusat',
-                appInfo: 'Kelola produk, pantau stok, dan bantu tim gudang bekerja lebih kompak—semuanya dalam satu tempat yang nyaman dipakai.',
-                logo: null,
-            };
-            setAppSettings(defaults);
-            setLogoFile(null);
-            setLogoPreview(null);
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('stockify_app_settings', JSON.stringify(defaults));
-                window.dispatchEvent(new CustomEvent('app_settings_changed', { detail: defaults }));
-            }
-            router.post('/app-settings', { ...defaults, remove_logo: '1' }, { preserveScroll: true });
-            setSettingsSavedMessage('Pengaturan & logo Stockify telah direset ke setelan awal!');
-            setTimeout(() => setSettingsSavedMessage(null), 3500);
+        setShowResetSettingsConfirm(true);
+    };
+
+    const executeResetSettings = () => {
+        setIsResettingSettings(true);
+        const defaults = {
+            appName: 'Stockify',
+            warehouseName: 'Gudang Pusat Logistik Cikarang',
+            contact: '021-8976500',
+            email: 'admin@stockify.test',
+            address: 'Kawasan Industri GIIC Blok AA No. 1, Cikarang Pusat',
+            appInfo: 'Kelola produk, pantau stok, dan bantu tim gudang bekerja lebih kompak—semuanya dalam satu tempat yang nyaman dipakai.',
+            logo: null,
+        };
+        setAppSettings(defaults);
+        setLogoFile(null);
+        setLogoPreview(null);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('stockify_app_settings', JSON.stringify(defaults));
+            window.dispatchEvent(new CustomEvent('app_settings_changed', { detail: defaults }));
         }
+        router.post('/app-settings', { ...defaults, remove_logo: '1' }, { 
+            preserveScroll: true,
+            onFinish: () => {
+                setIsResettingSettings(false);
+                setShowResetSettingsConfirm(false);
+                setSettingsSavedMessage('Pengaturan & logo Stockify telah direset ke setelan awal!');
+                triggerAlertToast('Pengaturan & identitas Stockify berhasil dikembalikan ke setelan awal.', 'success');
+            }
+        });
     };
 
     // Submissions
@@ -955,22 +986,151 @@ export default function Dashboard({
         });
     };
 
-    const deleteItem = (url: string, confirmMessage: string) => {
-        if (confirm(confirmMessage)) {
-            router.delete(url);
-        }
+    const handleExecuteDelete = () => {
+        if (!itemToDelete) return;
+        setIsDeletingItem(true);
+        router.delete(itemToDelete.url, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsDeletingItem(false);
+                triggerAlertToast(`${itemToDelete.categoryTitle} "${itemToDelete.name}" berhasil dihapus.`, 'success');
+                setItemToDelete(null);
+            },
+            onError: (errs) => {
+                setIsDeletingItem(false);
+                const errText = (Object.values(errs)[0] as string) || `Gagal menghapus ${itemToDelete.categoryTitle.toLowerCase()}.`;
+                triggerAlertToast(errText, 'error');
+                setItemToDelete(null);
+            }
+        });
+    };
+
+    const deleteItem = (
+        url: string, 
+        nameOrMessage: string, 
+        categoryTitle = 'Data', 
+        badge?: string,
+        fields?: Array<{ label: string; value: string | number; isHighlight?: boolean }>
+    ) => {
+        const cleanName = nameOrMessage.replace(/^Hapus\s+(produk|kategori|supplier|pengguna)?\s*["']?|["']?\?$/gi, '').trim() || nameOrMessage;
+        setItemToDelete({
+            url,
+            title: `Hapus ${categoryTitle}`,
+            name: cleanName,
+            categoryTitle,
+            badge,
+            message: `Apakah Anda yakin ingin menghapus ${categoryTitle.toLowerCase()} "${cleanName}"? Tindakan ini bersifat permanen dan data akan dihapus dari sistem.`,
+            fields
+        });
+    };
+
+    const executeCleanZeroStock = () => {
+        setIsCleaningZeroStock(true);
+        router.post('/products/clean-zero-stock', {}, {
+            preserveScroll: true,
+            onFinish: () => {
+                setIsCleaningZeroStock(false);
+                setShowCleanZeroStockConfirm(false);
+                triggerAlertToast('Pembersihan produk stok 0 (>3 hari) berhasil dijalankan.', 'success');
+            }
+        });
     };
 
     const updateTrxStatus = (id: number, status: string) => {
         router.patch(`/transactions/${id}/status`, { status });
     };
 
-    const confirmTask = (id: number) => {
-        if (userRole === 'staff_gudang') {
-            router.patch(`/transactions/${id}/prepare`, {});
-        } else {
-            router.patch(`/transactions/${id}/confirm`, {});
+    const handleExecuteTaskAction = () => {
+        if (!taskToConfirm) return;
+        setIsProcessingTask(true);
+        const { id, action } = taskToConfirm;
+
+        const endpoint = 
+            action === 'prepare' 
+                ? `/transactions/${id}/prepare` 
+                : action === 'reject'
+                ? `/transactions/${id}/reject`
+                : `/transactions/${id}/confirm`;
+
+        router.patch(endpoint, {}, {
+            onFinish: () => {
+                setIsProcessingTask(false);
+                setTaskToConfirm(null);
+            }
+        });
+    };
+
+    const confirmTask = (id: number, productDetails?: { name: string; sku?: string; quantity: number; type: 'in' | 'out' }) => {
+        if (productDetails) {
+            setTaskToConfirm({
+                id,
+                productName: productDetails.name,
+                sku: productDetails.sku,
+                quantity: productDetails.quantity,
+                type: productDetails.type,
+                action: userRole === 'staff_gudang' ? 'prepare' : 'confirm',
+            });
+            return;
         }
+
+        const trx = transactions.find(t => t.raw_id === id);
+        if (trx) {
+            setTaskToConfirm({
+                id,
+                productName: trx.product,
+                sku: trx.sku,
+                quantity: trx.quantity,
+                type: trx.type,
+                action: userRole === 'staff_gudang' ? 'prepare' : 'confirm',
+            });
+            return;
+        }
+
+        const inTask = pendingInTasks.find(t => t.raw_id === id);
+        if (inTask) {
+            setTaskToConfirm({
+                id,
+                productName: inTask.product,
+                sku: inTask.sku,
+                quantity: inTask.quantity,
+                type: 'in',
+                action: userRole === 'staff_gudang' ? 'prepare' : 'confirm',
+            });
+            return;
+        }
+
+        const outTask = pendingOutTasks.find(t => t.raw_id === id);
+        if (outTask) {
+            setTaskToConfirm({
+                id,
+                productName: outTask.product,
+                sku: outTask.sku,
+                quantity: outTask.quantity,
+                type: 'out',
+                action: userRole === 'staff_gudang' ? 'prepare' : 'confirm',
+            });
+            return;
+        }
+
+        setTaskToConfirm({
+            id,
+            productName: `ID #${id}`,
+            quantity: 1,
+            type: 'in',
+            action: userRole === 'staff_gudang' ? 'prepare' : 'confirm',
+        });
+    };
+
+    const rejectTask = (id: number) => {
+        const trx = transactions.find(t => t.raw_id === id);
+        setTaskToConfirm({
+            id,
+            productName: trx?.product || `Transaksi #${id}`,
+            sku: trx?.sku,
+            quantity: trx?.quantity || 1,
+            type: trx?.type || 'in',
+            action: 'reject',
+        });
     };
 
     const updateUserRole = (userId: number, role: string) => {
@@ -1203,32 +1363,29 @@ export default function Dashboard({
                     </div>
                 </div>
             ) : (
-                <div className="space-y-6 animate-in fade-in-50 duration-150">
-                    {/* Top Greeting & Action Card matching reference image (Khusus Staff Gudang, Manajer, Admin) */}
-                    {userRole !== 'customer' && (
-                        <div className="card-lift bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-200 dark:border-gray-700/60 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4 scroll-reveal print:hidden">
-                            <div>
-                                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
-                                    {activeTab === 'dashboard' ? (
-                                        <>Halo, {currentUser?.name ?? 'Admin'}! <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 ml-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 live-beacon" /> Operasional Aktif</span></>
-                                    ) : (
-                                        <>
-                                            {activeTab === 'products' && 'Manajemen Data Produk & Stok'}
-                                            {activeTab === 'categories' && 'Kategori Produk'}
-                                            {activeTab === 'suppliers' && 'Daftar Supplier / Pemasok'}
-                                            {activeTab === 'transactions' && 'Riwayat Transaksi Stok'}
-                                            {activeTab === 'opname' && 'Stock Opname (Pemeriksaan Fisik)'}
-                                            {activeTab === 'reports' && 'Laporan Mutasi & Stok'}
-                                            {activeTab === 'cash_flow' && 'Buku Kas & Laporan Arus Kas'}
-                                            {activeTab === 'warehouse_notes' && 'Catatan Cepat Operasional Gudang'}
-                                            {activeTab === 'orders_management' && 'Pesanan Customer (Penjualan Gudang)'}
-                                            {activeTab === 'refunds_management' && 'Pusat Persetujuan Refund Customer'}
-                                            {activeTab === 'users' && 'Manajemen Pengguna & Hak Akses'}
-                                            {activeTab === 'settings' && 'Pengaturan Umum Aplikasi'}
-                                            {activeTab === 'profile' && 'Pengaturan Profil & Foto Saya'}
-                                        </>
-                                    )}
-                                </h1>
+                <div className="space-y-6 animate-in fade-in-50 duration-150 print:animate-none print:opacity-100">
+                    {/* Top Greeting & Action Card matching reference image (Staff Gudang, Manajer, Admin) */}
+                    <div className="card-lift bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-200 dark:border-gray-700/60 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4 scroll-reveal print:hidden">
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
+                                {activeTab === 'dashboard' ? (
+                                    <>Halo, {currentUser?.name ?? 'Admin'}! <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 ml-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 live-beacon" /> Operasional Aktif</span></>
+                                ) : (
+                                    <>
+                                        {activeTab === 'products' && 'Manajemen Data Produk & Stok'}
+                                        {activeTab === 'categories' && 'Kategori Produk'}
+                                        {activeTab === 'suppliers' && 'Daftar Supplier / Pemasok'}
+                                        {activeTab === 'transactions' && 'Riwayat Transaksi Stok'}
+                                        {activeTab === 'opname' && 'Stock Opname (Pemeriksaan Fisik)'}
+                                        {activeTab === 'reports' && 'Laporan Mutasi & Stok'}
+                                        {activeTab === 'cash_flow' && 'Buku Kas & Laporan Arus Kas'}
+                                        {activeTab === 'warehouse_notes' && 'Catatan Cepat Operasional Gudang'}
+                                        {activeTab === 'users' && 'Manajemen Pengguna & Hak Akses'}
+                                        {activeTab === 'settings' && 'Pengaturan Umum Aplikasi'}
+                                        {activeTab === 'profile' && 'Pengaturan Profil & Foto Saya'}
+                                    </>
+                                )}
+                            </h1>
                                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                     {activeTab === 'dashboard'
                                         ? 'Berikut ringkasan operasional dan inventaris gudang hari ini.'
@@ -1305,10 +1462,9 @@ export default function Dashboard({
                                 )}
                             </div>
                         </div>
-                    )}
 
-                    {/* TAB 1: DASHBOARD (HANYA UNTUK STAFF GUDANG, MANAJER, ADMIN) */}
-                    {activeTab === 'dashboard' && userRole !== 'customer' && (
+                    {/* TAB 1: DASHBOARD (STAFF GUDANG, MANAJER, ADMIN) */}
+                    {activeTab === 'dashboard' && (
                         <>
                             {/* KHUSUS ROLE STAFF GUDANG: DAFTAR TUGAS OPERASIONAL */}
                             {userRole === 'staff_gudang' && (
@@ -1325,7 +1481,6 @@ export default function Dashboard({
                                     stats={stats}
                                     lowStockItems={lowStockItems}
                                     transactions={transactions}
-                                    pendingOrdersCount={orders.filter(o => o.order_status === 'pending_confirmation').length}
                                     onSelectTab={handleSelectTab}
                                     onOpenRestock={openRestockModal}
                                     onOpenStockOut={openStockOutModal}
@@ -1571,11 +1726,7 @@ export default function Dashboard({
                                     {userRole === 'admin' && (
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                if (confirm('Jalankan pembersihan sistem sekarang untuk menghapus produk yang stoknya 0 lebih dari 3 hari?')) {
-                                                    router.post('/products/clean-zero-stock');
-                                                }
-                                            }}
+                                            onClick={() => setShowCleanZeroStockConfirm(true)}
                                             className="btn-press inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 cursor-pointer shadow-2xs"
                                             title="Bersihkan otomatis produk dengan stok 0 lebih dari 3 hari"
                                         >
@@ -1732,7 +1883,10 @@ export default function Dashboard({
                                                             {userRole === 'admin' && (
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => deleteItem(`/products/${p.id}`, `Hapus produk "${p.name}"?`)}
+                                                                    onClick={() => deleteItem(`/products/${p.id}`, p.name, 'Produk', p.sku, [
+                                                                        { label: 'Kategori', value: p.category_name },
+                                                                        { label: 'Stok Saat Ini', value: `${p.current_stock} Unit`, isHighlight: true },
+                                                                    ])}
                                                                     className="p-1 text-red-600 hover:bg-red-50 rounded cursor-pointer"
                                                                     title="Hapus Produk"
                                                                 >
@@ -1916,7 +2070,9 @@ export default function Dashboard({
                                                             </button>
                                                             <button
                                                                 type="button"
-                                                                onClick={() => deleteItem(`/categories/${c.id}`, `Hapus kategori "${c.name}"?`)}
+                                                                onClick={() => deleteItem(`/categories/${c.id}`, c.name, 'Kategori', undefined, [
+                                                                    { label: 'Jumlah Produk Terkait', value: `${c.products_count ?? 0} Produk` },
+                                                                ])}
                                                                 className="p-1 text-red-600 hover:bg-red-50 rounded cursor-pointer"
                                                                 title="Hapus Kategori"
                                                             >
@@ -1999,7 +2155,10 @@ export default function Dashboard({
                                                             </button>
                                                             <button
                                                                 type="button"
-                                                                onClick={() => deleteItem(`/suppliers/${s.id}`, `Hapus supplier "${s.name}"?`)}
+                                                                onClick={() => deleteItem(`/suppliers/${s.id}`, s.name, 'Supplier', s.phone || 'Mitra', [
+                                                                    { label: 'Kontak Telepon', value: s.phone || '-' },
+                                                                    { label: 'Email', value: s.email || '-' },
+                                                                ])}
                                                                 className="p-1 text-red-600 hover:bg-red-50 rounded cursor-pointer"
                                                                 title="Hapus Supplier"
                                                             >
@@ -2200,7 +2359,7 @@ export default function Dashboard({
                                                                     <>
                                                                         <button
                                                                             type="button"
-                                                                            onClick={() => confirmTask(trx.raw_id)}
+                                                                            onClick={() => confirmTask(trx.raw_id, { name: trx.product, sku: trx.sku, quantity: trx.quantity, type: trx.type })}
                                                                             className="btn-press px-2.5 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-2xs cursor-pointer inline-flex items-center gap-1"
                                                                             title="Konfirmasi & sahkan mutasi stok"
                                                                         >
@@ -2251,7 +2410,7 @@ export default function Dashboard({
 
                     {/* TAB 7: LAPORAN MUTASI & AKTIVITAS */}
                     {activeTab === 'reports' && (
-                        <div className="space-y-6 animate-in fade-in duration-200">
+                        <div className="space-y-6 animate-in fade-in duration-200 print:animate-none print:opacity-100 print:space-y-3">
                             {/* Kop Dokumen Resmi Laporan Gudang (Khusus Cetak / Print-Only) */}
                             <div className="print-only mb-6 pb-4 border-b-2 border-gray-900">
                                 <div className="flex items-start justify-between">
@@ -2497,7 +2656,7 @@ export default function Dashboard({
                                                 Laporan Transaksi Barang Masuk & Keluar
                                             </h3>
                                             <p className="text-xs text-gray-400">
-                                                Rekap mutasi barang masuk dari supplier dan barang keluar ke ekspedisi/pelanggan
+                                                Rekap mutasi barang masuk dari supplier dan barang keluar ke ekspedisi/tujuan operasional
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -2777,7 +2936,10 @@ export default function Dashboard({
                                                         {u.id !== currentUser?.id && (
                                                             <button
                                                                 type="button"
-                                                                onClick={() => deleteItem(`/users/${u.id}`, `Hapus pengguna "${u.name}"?`)}
+                                                                onClick={() => deleteItem(`/users/${u.id}`, u.name, 'Pengguna', u.role.replace('_', ' ').toUpperCase(), [
+                                                                    { label: 'Email', value: u.email },
+                                                                    { label: 'Role Akses', value: u.role.replace('_', ' ') },
+                                                                ])}
                                                                 className="p-1 text-red-600 hover:bg-red-50 rounded"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -2796,19 +2958,25 @@ export default function Dashboard({
                     {/* TAB 9: PENGATURAN UMUM APLIKASI (KHUSUS ADMIN) */}
                     {activeTab === 'settings' && userRole === 'admin' && (
                         <div className="space-y-6">
-                            {/* Notification Toast Banner */}
+                            {/* Notification Toast Banner Konsisten */}
                             {settingsSavedMessage && (
-                                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
-                                    <div className="flex items-center gap-2.5">
-                                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                                        <span>{settingsSavedMessage}</span>
+                                <div className="p-4 bg-emerald-600 dark:bg-emerald-700 text-white rounded-2xl shadow-md border border-emerald-500 dark:border-emerald-600 flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-1.5 rounded-xl bg-emerald-700/60 dark:bg-emerald-800/60 shrink-0">
+                                            <CheckCircle2 className="w-5 h-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-extrabold text-[11px] tracking-wider uppercase opacity-95">Berhasil Disimpan</h4>
+                                            <p className="text-xs font-medium mt-0.5">{settingsSavedMessage}</p>
+                                        </div>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setSettingsSavedMessage(null)}
-                                        className="text-emerald-600 hover:text-emerald-800 text-xs font-bold"
+                                        className="p-1 rounded-lg hover:bg-white/20 transition-colors text-white cursor-pointer"
+                                        title="Tutup Alert"
                                     >
-                                        Tutup
+                                        <X className="w-4 h-4" />
                                     </button>
                                 </div>
                             )}
@@ -3244,35 +3412,6 @@ export default function Dashboard({
                                 </div>
                             </div>
                         </div>
-                    )}
-
-                    {/* TAB KHUSUS CUSTOMER: DISPLAY & KATALOG PRODUK */}
-                    {activeTab === 'catalog' && (
-                        <CustomerCatalog
-                            products={products}
-                            categories={categories}
-                            staffMembers={staffMembers}
-                        />
-                    )}
-
-                    {/* TAB KHUSUS CUSTOMER: PESANAN & PEMBAYARAN */}
-                    {activeTab === 'my_orders' && (
-                        <CustomerOrdersTab orders={orders} currentUser={currentUser} />
-                    )}
-
-                    {/* TAB KHUSUS CUSTOMER: STATUS REFUND */}
-                    {activeTab === 'my_refunds' && (
-                        <CustomerRefundsTab orders={orders} />
-                    )}
-
-                    {/* TAB STAFF & ADMIN: DAFTAR PESANAN CUSTOMER */}
-                    {activeTab === 'orders_management' && (
-                        <AdminOrdersTab orders={orders} currentUser={currentUser} />
-                    )}
-
-                    {/* TAB STAFF & ADMIN: PUSAT PERSETUJUAN REFUND */}
-                    {activeTab === 'refunds_management' && (
-                        <AdminRefundsTab refundRequests={refundRequests} />
                     )}
 
                     {/* TAB MANAGEMENT: BUKU KAS & LAPORAN ARUS KAS */}
@@ -4849,6 +4988,125 @@ export default function Dashboard({
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Modal Alert Konfirmasi Transaksi / Mutasi Stok Produk */}
+            {taskToConfirm && (
+                <ConfirmAlertModal
+                    isOpen={!!taskToConfirm}
+                    onClose={() => setTaskToConfirm(null)}
+                    onConfirm={handleExecuteTaskAction}
+                    isLoading={isProcessingTask}
+                    title={
+                        taskToConfirm.action === 'prepare'
+                            ? (taskToConfirm.type === 'in' ? 'Konfirmasi Pemeriksaan Barang Masuk' : 'Konfirmasi Penyiapan Barang Keluar')
+                            : taskToConfirm.action === 'reject'
+                            ? 'Tolak Mutasi Stok Produk'
+                            : (taskToConfirm.type === 'in' ? 'Sahkan Mutasi Masuk (Tambah Stok)' : 'Sahkan Mutasi Keluar (Potong Stok)')
+                    }
+                    message={
+                        taskToConfirm.action === 'prepare'
+                            ? (taskToConfirm.type === 'in'
+                                ? `Tandai bahwa produk fisik "${taskToConfirm.productName}" sebanyak ${taskToConfirm.quantity} unit telah tiba di gudang dan selesai diperiksa kondisi fisiknya.`
+                                : `Tandai bahwa produk fisik "${taskToConfirm.productName}" sebanyak ${taskToConfirm.quantity} unit telah disiapkan dari rak gudang untuk proses pengiriman.`)
+                            : taskToConfirm.action === 'reject'
+                            ? `Apakah Anda yakin ingin menolak transaksi mutasi produk "${taskToConfirm.productName}"? Saldo inventaris tidak akan berubah.`
+                            : (taskToConfirm.type === 'in'
+                                ? `Apakah Anda yakin ingin mengesahkan transaksi masuk ini? Saldo stok inventaris untuk "${taskToConfirm.productName}" akan bertambah sebanyak +${taskToConfirm.quantity} unit.`
+                                : `Apakah Anda yakin ingin mengesahkan transaksi keluar ini? Saldo stok inventaris untuk "${taskToConfirm.productName}" akan berkurang sebanyak -${taskToConfirm.quantity} unit.`)
+                    }
+                    variant={
+                        taskToConfirm.action === 'reject'
+                            ? 'danger'
+                            : taskToConfirm.type === 'in'
+                            ? 'success'
+                            : taskToConfirm.action === 'prepare'
+                            ? 'primary'
+                            : 'warning'
+                    }
+                    confirmText={
+                        taskToConfirm.action === 'prepare'
+                            ? (taskToConfirm.type === 'in' ? 'Ya, Tandai Diperiksa' : 'Ya, Tandai Disiapkan')
+                            : taskToConfirm.action === 'reject'
+                            ? 'Ya, Tolak Mutasi'
+                            : (taskToConfirm.type === 'in' ? 'Ya, Sahkan & Tambah Stok' : 'Ya, Sahkan & Potong Stok')
+                    }
+                    cancelText="Batal"
+                    productDetails={{
+                        name: taskToConfirm.productName,
+                        sku: taskToConfirm.sku,
+                        quantity: taskToConfirm.quantity,
+                        unit: 'unit',
+                        actionLabel: taskToConfirm.action === 'prepare'
+                            ? (taskToConfirm.type === 'in' ? 'Status: Selesai Diperiksa Staff' : 'Status: Selesai Disiapkan Staff')
+                            : taskToConfirm.action === 'reject'
+                            ? 'Status: Ditolak / Dibatalkan'
+                            : (taskToConfirm.type === 'in' ? 'Mutasi Masuk (Penambahan Saldo)' : 'Mutasi Keluar (Pengurangan Saldo)')
+                    }}
+                />
+            )}
+
+            {/* Modal Alert Konfirmasi Hapus Data (Produk, Kategori, Supplier, Pengguna) */}
+            {itemToDelete && (
+                <ConfirmAlertModal
+                    isOpen={!!itemToDelete}
+                    onClose={() => setItemToDelete(null)}
+                    onConfirm={handleExecuteDelete}
+                    isLoading={isDeletingItem}
+                    title={itemToDelete.title}
+                    message={itemToDelete.message}
+                    variant="danger"
+                    confirmText={`Ya, Hapus ${itemToDelete.categoryTitle}`}
+                    cancelText="Batal"
+                    itemDetails={{
+                        headerTitle: `Rincian ${itemToDelete.categoryTitle} yang akan dihapus`,
+                        name: itemToDelete.name,
+                        badge: itemToDelete.badge,
+                        fields: itemToDelete.fields
+                    }}
+                />
+            )}
+
+            {/* Modal Alert Konfirmasi Reset Pengaturan Aplikasi */}
+            {showResetSettingsConfirm && (
+                <ConfirmAlertModal
+                    isOpen={showResetSettingsConfirm}
+                    onClose={() => setShowResetSettingsConfirm(false)}
+                    onConfirm={executeResetSettings}
+                    isLoading={isResettingSettings}
+                    title="Kembalikan Pengaturan ke Default"
+                    message="Apakah Anda yakin ingin mengembalikan logo, nama aplikasi, alamat gudang, dan seluruh konfigurasi identitas Stockify ke setelan awal pabrik?"
+                    variant="warning"
+                    confirmText="Ya, Reset ke Setelan Awal"
+                    cancelText="Batal"
+                    itemDetails={{
+                        headerTitle: 'Konfigurasi Sistem',
+                        name: 'Identitas & Logo Stockify',
+                        badge: 'Reset Pabrik',
+                        description: 'Pengaturan kustom saat ini akan digantikan dengan konfigurasi default Stockify.'
+                    }}
+                />
+            )}
+
+            {/* Modal Alert Konfirmasi Pembersihan Stok 0 */}
+            {showCleanZeroStockConfirm && (
+                <ConfirmAlertModal
+                    isOpen={showCleanZeroStockConfirm}
+                    onClose={() => setShowCleanZeroStockConfirm(false)}
+                    onConfirm={executeCleanZeroStock}
+                    isLoading={isCleaningZeroStock}
+                    title="Pembersihan Otomatis Produk Kosong"
+                    message="Sistem akan memeriksa dan menghapus data produk yang memiliki saldo stok 0 selama lebih dari 3 hari. Tindakan ini membantu menjaga kerapian katalog inventaris Anda."
+                    variant="warning"
+                    confirmText="Ya, Jalankan Pembersihan"
+                    cancelText="Batal"
+                    itemDetails={{
+                        headerTitle: 'Pemeliharaan Inventaris',
+                        name: 'Pembersihan Produk Stok Kosong',
+                        badge: '> 3 Hari Kosong',
+                        description: 'Produk yang dihapus tidak dapat dipulihkan secara otomatis.'
+                    }}
+                />
             )}
         </FlowbiteAdminLayout>
     );

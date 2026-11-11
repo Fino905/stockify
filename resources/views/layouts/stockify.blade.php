@@ -76,24 +76,10 @@
             </button>
         </div>
         <nav class="flex-1 space-y-1 px-3 py-4">
-            <a href="{{ auth()->user()->role === 'Customer' ? route('shop.index') : route('dashboard') }}" class="{{ request()->routeIs('dashboard', 'shop.*') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
+            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
                 <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
-                {{ auth()->user()->role === 'Customer' ? 'Belanja produk' : 'Dashboard' }}
+                Dashboard
             </a>
-            @if (auth()->user()->role === 'Customer')
-                <a href="{{ route('purchases.index') }}" class="{{ request()->routeIs('purchases.*') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
-                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3h9l4 4v14H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 3v5h5M8 12h8m-8 4h8"/></svg>
-                    Riwayat pembelian
-                </a>
-                <a href="{{ route('feedback.index') }}" class="{{ request()->routeIs('feedback.*') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
-                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg>
-                    Feedback produk
-                </a>
-                <a href="{{ route('refunds.index') }}" class="{{ request()->routeIs('refunds.index') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
-                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 11a9 9 0 1 1 2.6 6.4M3 4v7h7"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"/></svg>
-                    Riwayat refund
-                </a>
-            @else
             @if (in_array(auth()->user()->role, ['Admin', 'Manajer Gudang'], true))
                 <a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
                     <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m3 7 9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7M12 11v10"/></svg>
@@ -115,14 +101,6 @@
                 </a>
             @endif
             @if (auth()->user()->role === 'Admin')
-                <a href="{{ route('sales.index') }}" class="{{ request()->routeIs('sales.*') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
-                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3h9l4 4v14H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 3v5h5M8 12h8m-8 4h5"/></svg>
-                    Pesanan & pembayaran
-                </a>
-                <a href="{{ route('refunds.admin') }}" class="{{ request()->routeIs('refunds.admin', 'refunds.review') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
-                    <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 11a9 9 0 1 1 2.6 6.4M3 4v7h7"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"/></svg>
-                    Kelola refund
-                </a>
                 <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'bg-theme-primary-light text-theme-primary-text' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }} flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition">
                     <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
                     Kategori produk
@@ -140,13 +118,27 @@
                     Pengaturan
                 </a>
             @endif
-            @endif
         </nav>
         <div class="border-t border-slate-100 px-5 py-3 text-xs text-slate-400">{{ $applicationName }}</div>
     </aside>
 
     <main id="main-content" class="min-h-screen pt-16 transition-[margin] duration-200 lg:ml-64">
         <div class="workspace-content mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-emerald-500 bg-emerald-600 p-4 text-xs font-semibold text-white shadow-lg animate-in fade-in">
+                    <div class="flex items-center gap-2.5">
+                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>{{ session('success') }}</span>
+                    </div>
+                </div>
+            @elseif (session('error'))
+                <div class="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-rose-500 bg-rose-600 p-4 text-xs font-semibold text-white shadow-lg animate-in fade-in">
+                    <div class="flex items-center gap-2.5">
+                        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                </div>
+            @endif
             @yield('content')
         </div>
         <footer class="border-t border-slate-200 bg-white px-4 py-4 text-center text-xs text-slate-500 sm:px-6">

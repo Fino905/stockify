@@ -22,8 +22,7 @@ import {
     ClipboardCheck,
     BarChart3,
     Zap,
-    ChevronDown,
-    ShoppingBag
+    ChevronDown
 } from 'lucide-react';
 
 type Props = {
@@ -93,11 +92,11 @@ export default function Login({
     }, []);
 
     const [showDemoAccounts, setShowDemoAccounts] = useState(true);
-    const [selectedRole, setSelectedRole] = useState<'admin' | 'manajer' | 'staff' | 'customer'>('admin');
+    const [selectedRole, setSelectedRole] = useState<'admin' | 'manajer' | 'staff'>('admin');
     const [showPassword, setShowPassword] = useState(false);
     const [isInstantLoggingIn, setIsInstantLoggingIn] = useState(false);
 
-    const handleQuickFill = (role: 'admin' | 'manajer' | 'staff' | 'customer', email: string) => {
+    const handleQuickFill = (role: 'admin' | 'manajer' | 'staff', email: string) => {
         setSelectedRole(role);
         const emailEl = document.getElementById('email') as HTMLInputElement;
         const pwdEl = document.getElementById('password') as HTMLInputElement;
@@ -183,7 +182,7 @@ export default function Login({
                     </h2>
 
                     <p className="mt-4 text-slate-300 text-sm leading-relaxed">
-                        Dirancang khusus untuk mendukung operasional multi-role terisolasi: Admin, Manajer Gudang, Staff Lapangan, dan Customer secara real-time.
+                        Dirancang khusus untuk mendukung operasional multi-role terisolasi: Admin, Manajer Gudang, dan Staff Lapangan secara real-time.
                     </p>
 
                 </div>
@@ -255,7 +254,7 @@ export default function Login({
                             </p>
                         </div>
 
-                        {/* Demo Accounts Pill Switcher (Admin, Manajer, Staff, Customer) */}
+                        {/* Demo Accounts Pill Switcher (Admin, Manajer, Staff) */}
                         <div className="mb-5">
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
@@ -263,11 +262,11 @@ export default function Login({
                                 </span>
                                 <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-full flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    4 Role
+                                    3 Role
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-semibold">
+                            <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-semibold">
                                 <button
                                     type="button"
                                     onClick={() => handleQuickFill('admin', 'admin@stockify.test')}
@@ -305,19 +304,6 @@ export default function Login({
                                 >
                                     <ClipboardCheck className="w-3.5 h-3.5" />
                                     <span>Staff</span>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => handleQuickFill('customer', 'customer@stockify.test')}
-                                    className={`py-2 px-1 rounded-lg text-center transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                                        selectedRole === 'customer'
-                                            ? 'bg-blue-600 text-white font-bold shadow-xs'
-                                            : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
-                                    }`}
-                                >
-                                    <ShoppingBag className="w-3.5 h-3.5" />
-                                    <span>Customer</span>
                                 </button>
                             </div>
 
@@ -487,7 +473,7 @@ export default function Login({
                                 href="/register"
                                 className="font-bold text-blue-600 hover:text-blue-700 hover:underline ml-1"
                             >
-                                Daftar Akun Customer &rarr;
+                                Daftar Akun Staff Gudang &rarr;
                             </Link>
                         </div>
 

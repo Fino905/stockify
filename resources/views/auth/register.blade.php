@@ -7,12 +7,12 @@
     $warehouseName = $appSettings['warehouseName'] ?? 'Gudang Pusat Logistik';
 @endphp
 
-@section('title', 'Daftar Akun Customer - ' . $appName)
+@section('title', 'Daftar Akun Staff Gudang - ' . $appName)
 
 @section('content')
 <div class="min-h-screen w-full flex flex-col lg:flex-row bg-slate-50 font-sans selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
 
-    {{-- ================= DESKTOP LEFT PANEL (>= lg): Showcase Hero & Customer Features ================= --}}
+    {{-- ================= DESKTOP LEFT PANEL (>= lg): Showcase Hero & Staff Features ================= --}}
     <div class="hidden lg:flex lg:w-1/2 min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white p-10 xl:p-14 flex-col justify-between relative overflow-hidden select-none border-r border-slate-800/80">
         
         {{-- Soft Ambient Lighting (Tenang & Tidak Menyala Terlalu Neon) --}}
@@ -45,29 +45,29 @@
                 <div class="flex flex-col">
                     <div class="flex items-center gap-2">
                         <span class="font-black text-xl text-white tracking-tight dynamic-app-name">{{ $appName }}<span class="text-blue-400">.</span></span>
-                        <span class="text-[10px] font-bold text-blue-300 bg-blue-500/20 border border-blue-400/30 px-2 py-0.5 rounded-full">Customer Portal</span>
+                        <span class="text-[10px] font-bold text-blue-300 bg-blue-500/20 border border-blue-400/30 px-2 py-0.5 rounded-full">Warehouse Portal</span>
                     </div>
                     <span class="text-[11px] text-slate-400 font-medium truncate max-w-[260px]">{{ $warehouseName }}</span>
                 </div>
             </a>
         </div>
 
-        {{-- Center Content: Tagline, Value Proposition & Customer Features --}}
+        {{-- Center Content: Tagline, Value Proposition & Staff Features --}}
         <div class="relative z-10 max-w-lg my-auto py-8">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-semibold mb-5 backdrop-blur-md">
                 <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                <span>Akses Eksklusif Pelanggan &amp; Mitra Toko</span>
+                <span>Akses Sistem Internal Pergudangan &amp; Logistik</span>
             </div>
 
             <h1 class="text-3xl xl:text-4xl font-black text-white leading-tight tracking-tight">
-                Katalog Inventaris &amp; Pemesanan Belanja
+                Registrasi Akun Baru
                 <span class="block bg-gradient-to-r from-blue-400 via-indigo-300 to-sky-300 bg-clip-text text-transparent">
-                    Langsung dari Gudang.
+                    Staf Operasional Gudang.
                 </span>
             </h1>
 
             <p class="mt-4 text-slate-300 text-sm leading-relaxed">
-                Daftarkan akun pelanggan Anda untuk memantau ketersediaan stok fisik barang secara akurat, memesan produk gudang secara mandiri, dan melacak riwayat transaksi dengan transparan.
+                Daftarkan akun staf baru untuk mengelola inventaris fisik, mencatat mutasi barang masuk &amp; keluar, dan berkolaborasi secara real-time.
             </p>
 
         </div>
@@ -77,7 +77,7 @@
             <span>&copy; {{ date('Y') }} {{ $appName }} Warehouse OS</span>
             <span class="inline-flex items-center gap-2 text-emerald-400 font-semibold">
                 <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                Layanan Pelanggan Aktif
+                Layanan Gudang Aktif
             </span>
         </div>
     </div>
@@ -111,7 +111,7 @@
                 </div>
                 <div class="flex flex-col">
                     <span class="font-extrabold text-base text-slate-900 tracking-tight dynamic-app-name">{{ $appName }}</span>
-                    <span class="text-[10px] text-slate-500 font-medium">Customer Portal</span>
+                    <span class="text-[10px] text-slate-500 font-medium">Warehouse Portal</span>
                 </div>
             </a>
 
@@ -156,27 +156,26 @@
                         <span>Registrasi Akun Baru</span>
                     </div>
                     <h2 class="text-2xl font-black text-slate-900 tracking-tight">
-                        Daftar Akun Customer
+                        Daftar Akun Staff Gudang
                     </h2>
                     <p class="text-xs text-slate-500 mt-1">
-                        Buat akun belanja untuk mengecek stok gudang dan memesan langsung.
+                        Buat akun staf operasional untuk mencatat penerimaan dan pengeluaran barang.
                     </p>
                 </div>
 
-                {{-- Customer Role Highlight (Clean Slate Box, No Neon) --}}
+                {{-- Staff Role Highlight (Clean Slate Box, No Neon) --}}
                 <div class="mb-5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <div class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
                             <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                                <path d="M3 6h18" />
-                                <path d="M16 10a4 4 0 0 1-8 0" />
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
                             </svg>
                         </div>
                         <span class="font-medium text-slate-700">Peran Akun:</span>
                     </div>
                     <span class="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
-                        Customer (Pembeli)
+                        Staff Gudang (Operasional)
                     </span>
                 </div>
 
@@ -231,7 +230,7 @@
                                 value="{{ old('email') }}"
                                 tabindex="2"
                                 autocomplete="email"
-                                placeholder="customer@stockify.test"
+                                placeholder="staff@stockify.test"
                                 class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-500/15 transition-all"
                             />
                         </div>
@@ -318,7 +317,7 @@
                             tabindex="5"
                             class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
                         >
-                            <span>Daftar Akun Customer</span>
+                            <span>Daftar Akun Baru</span>
                             <svg class="w-4 h-4 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14m-7-7 7 7-7 7"/>
                             </svg>

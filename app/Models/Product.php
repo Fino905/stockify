@@ -54,16 +54,6 @@ class Product extends Model
         return $this->hasMany(StockTransaction::class, 'product_id');
     }
 
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class, 'product_id');
-    }
-
-    public function feedbacks(): HasMany
-    {
-        return $this->hasMany(OrderFeedback::class, 'product_id');
-    }
-
     public function getImageUrlAttribute(): ?string
     {
         if (! $this->image) {

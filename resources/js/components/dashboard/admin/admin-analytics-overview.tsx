@@ -124,7 +124,7 @@ export function AdminAnalyticsOverview({
         },
         out: {
             title: 'Statistik Barang Keluar (Pengiriman & Pesanan)',
-            subtitle: 'Distribusi barang keluar ke ekspedisi dan pelanggan',
+            subtitle: 'Distribusi barang keluar ke ekspedisi dan outlet/cabang',
             unit: 'Unit',
             tabTarget: 'transactions',
             tabName: 'Daftar Barang Keluar',

@@ -83,6 +83,8 @@ class Setting extends Model
      */
     public static function getAppSettings(): array
     {
+        $groqKey = static::valueFor('groq_api_key') ?: config('services.groq.api_key') ?: env('GROQ_API_KEY');
+
         return [
             'appName' => (string) static::valueFor('app_name', 'Stockify'),
             'warehouseName' => (string) static::valueFor('warehouse_name', 'Gudang Pusat Logistik Cikarang'),
@@ -91,6 +93,8 @@ class Setting extends Model
             'address' => (string) static::valueFor('address', static::valueFor('warehouse_address', 'Kawasan Industri GIIC Blok AA No. 1, Cikarang Pusat')),
             'appInfo' => (string) static::valueFor('app_info', 'Kelola produk, pantau stok, dan bantu tim gudang bekerja lebih kompak—semuanya dalam satu tempat yang nyaman dipakai.'),
             'logo' => static::getLogoUrl(),
+            'hasGroqKey' => ! empty($groqKey),
+            'groqVisionModel' => (string) (config('services.groq.vision_model') ?: env('GROQ_VISION_MODEL', 'qwen/qwen3.8-27b')),
         ];
     }
 }

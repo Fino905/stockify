@@ -72,7 +72,7 @@
             </h1>
 
             <p class="mt-4 text-slate-300 text-sm leading-relaxed">
-                Kelola master produk, pantau barang masuk &amp; keluar secara real-time, laksanakan audit Stock Opname tanpa selisih, dan otorisasi terisolasi 4-Role.
+                Kelola master produk, pantau barang masuk &amp; keluar secara real-time, laksanakan audit Stock Opname tanpa selisih, dan otorisasi terisolasi 3-Role (Admin, Manajer, Staff).
             </p>
 
         </div>
@@ -178,7 +178,7 @@
                     </p>
                 </div>
 
-                {{-- Pilihan Akun Demo (4 Role Switcher - Admin, Manajer, Staff, Customer) --}}
+                {{-- Pilihan Akun Demo (3 Role Switcher - Admin, Manajer, Staff) --}}
                 <div class="mb-5">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
@@ -186,11 +186,11 @@
                         </span>
                         <span class="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            4 Role Siap Pakai
+                            3 Role Siap Pakai
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-semibold">
+                    <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-semibold">
                         <button
                             type="button"
                             id="role-tab-admin"
@@ -211,13 +211,6 @@
                             onclick="switchDemoRole('staff', 'staff@stockify.test', 'password', 'Staff Lapangan')"
                             class="role-tab py-2 px-1 rounded-lg text-center transition-all text-slate-600 hover:text-slate-900 hover:bg-white/80 cursor-pointer">
                             Staff
-                        </button>
-                        <button
-                            type="button"
-                            id="role-tab-customer"
-                            onclick="switchDemoRole('customer', 'customer@stockify.test', 'password', 'Customer Toko')"
-                            class="role-tab py-2 px-1 rounded-lg text-center transition-all text-slate-600 hover:text-slate-900 hover:bg-white/80 cursor-pointer">
-                            Customer
                         </button>
                     </div>
                 </div>
@@ -325,13 +318,13 @@
                     </div>
                 </form>
 
-                {{-- Link Sign Up Customer --}}
+                {{-- Link Sign Up Staff --}}
                 <div class="mt-6 pt-5 border-t border-slate-100 text-center text-xs text-slate-500">
                     Belum memiliki akun?
                     <a
                         href="{{ route('register') }}"
                         class="text-blue-600 hover:text-blue-700 font-bold ml-1 hover:underline">
-                        Daftar Akun Customer &rarr;
+                        Daftar Akun Staff Gudang &rarr;
                     </a>
                 </div>
 
@@ -435,8 +428,6 @@
             switchDemoRole('manajer', initialEmail, 'password', 'Manajer Gudang');
         } else if (initialEmail.includes('staff')) {
             switchDemoRole('staff', initialEmail, 'password', 'Staff Lapangan');
-        } else if (initialEmail.includes('customer')) {
-            switchDemoRole('customer', initialEmail, 'password', 'Customer Toko');
         } else {
             switchDemoRole('admin', 'admin@stockify.test', 'password', 'Admin Full Akses');
         }

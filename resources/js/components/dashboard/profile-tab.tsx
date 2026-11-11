@@ -170,12 +170,6 @@ export function ProfileTab({ currentUser }: ProfileTabProps) {
                     badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
                     desc: 'Fokus pada operasional gudang, pemeriksaan barang masuk, penyiapan pesanan keluar, dan catatan gudang.',
                 };
-            case 'customer':
-                return {
-                    name: 'Customer / Pelanggan',
-                    badge: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
-                    desc: 'Dapat menjelajahi katalog barang, melakukan pemesanan, melihat riwayat transaksi, serta mengajukan refund.',
-                };
             default:
                 return {
                     name: 'Pengguna',

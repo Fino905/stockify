@@ -291,7 +291,7 @@ export default function Welcome({
     // ROI Calculator State
     const [skuVolume, setSkuVolume] = useState<number>(500);
 
-    // Filter, Search & Pagination for Customer Catalog Showcase
+    // Filter, Search & Pagination for Product Catalog Showcase
     const ITEMS_PER_PAGE = 6;
     const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -586,7 +586,7 @@ export default function Welcome({
                                         </div>
                                         <div className="min-w-0">
                                             <span className="block font-bold text-slate-900 truncate">Hierarki Multi-Role</span>
-                                            <span className="block text-[11px] text-slate-500 font-normal truncate">Admin, Manajer, Staff Gudang, Customer</span>
+                                            <span className="block text-[11px] text-slate-500 font-normal truncate">Admin, Manajer, Staff Gudang</span>
                                         </div>
                                     </div>
                                     <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0" />
@@ -957,7 +957,7 @@ export default function Welcome({
                                                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
                                                 <div>
                                                     <span className="font-bold text-slate-800 block">Penyiapan Pengeluaran Ekspedisi</span>
-                                                    <span className="text-[11px] text-slate-500">20 Unit Pesanan Customer</span>
+                                                    <span className="text-[11px] text-slate-500">20 Unit Alokasi Mutasi Keluar</span>
                                                 </div>
                                             </div>
                                             <span className="px-2.5 py-1 rounded bg-blue-100 text-blue-800 font-bold text-[10px]">
@@ -1004,14 +1004,14 @@ export default function Welcome({
                             Arsitektur Multi-Role
                         </span>
                         <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-3">
-                            Struktur Otorisasi 4 Peran Terintegrasi
+                            Struktur Otorisasi 3 Peran Gudang Terintegrasi
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
-                            Satu sistem terpadu melayani seluruh hierarki operasional dari kepemilikan data, pengawasan manajerial, pelaksana fisik gudang, hingga akses katalog pembeli:
+                            Satu sistem terpadu melayani seluruh hierarki operasional dari kepemilikan data, pengawasan manajerial, hingga pelaksana fisik gudang:
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-6">
                         
                         {/* Role 1: Administrator */}
                         <div className="p-6 rounded-2xl border border-slate-200 bg-gradient-to-b from-blue-50/50 to-white hover:border-blue-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-5 scroll-reveal transition-all duration-700 delay-75 ease-out opacity-0 translate-y-8 group">
@@ -1081,35 +1081,11 @@ export default function Welcome({
                                 <span>Akses Portal Staff</span>
                             </a>
                         </div>
-
-                        {/* Role 4: Customer */}
-                        <div className="p-6 rounded-2xl border border-slate-200 bg-gradient-to-b from-indigo-50/50 to-white hover:border-indigo-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-5 scroll-reveal transition-all duration-700 delay-300 ease-out opacity-0 translate-y-8 group">
-                            <div className="space-y-3">
-                                <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black shadow-md shadow-indigo-500/30 group-hover:scale-110 transition-transform">
-                                    <Store className="w-6 h-6" />
-                                </div>
-                                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 text-indigo-800">
-                                    Portal Belanja
-                                </span>
-                                <h3 className="text-lg font-black text-slate-900">4. Customer</h3>
-                                <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                                    Akses katalog publik lengkap foto produk, stok real-time, keranjang belanja, simulasi pembayaran aman, dan riwayat pesanan.
-                                </p>
-                            </div>
-                            <a
-                                href="/login"
-                                className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 transition hover:-translate-y-0.5"
-                            >
-                                <ShoppingBag className="w-3.5 h-3.5" />
-                                <span>Akses Portal Customer</span>
-                            </a>
-                        </div>
-
                     </div>
                 </div>
             </section>
 
-            {/* SECTION KATALOG PRODUK INTERAKTIF (CUSTOMER SHOWCASE) */}
+            {/* SECTION KATALOG PRODUK INTERAKTIF (PRODUCT SHOWCASE) */}
             <section id="katalog" className="scroll-mt-20 py-20 bg-slate-50 border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 scroll-reveal transition-all duration-700 ease-out opacity-0 translate-y-8">
@@ -1121,7 +1097,7 @@ export default function Welcome({
                                 Produk Aktif di Gudang Stockify
                             </h2>
                             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                                Data inventaris real-time yang siap dipesan oleh pelanggan mitra:
+                                Data inventaris real-time yang tersimpan di sistem manajemen pergudangan:
                             </p>
                         </div>
 
@@ -1237,11 +1213,11 @@ export default function Welcome({
                                         {/* Action Button: Langsung ke Login untuk Membeli */}
                                         <div className="p-5 pt-0">
                                             <a
-                                                href={auth?.user ? "/dashboard?tab=catalog" : "/login"}
+                                                href={auth?.user ? "/dashboard?tab=products" : "/login"}
                                                 className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5"
                                             >
-                                                <ShoppingBag className="w-3.5 h-3.5" />
-                                                <span>{auth?.user ? 'Pesan di Portal Customer' : 'Login untuk Beli'}</span>
+                                                <Package className="w-3.5 h-3.5" />
+                                                <span>{auth?.user ? 'Kelola Stok di Dashboard' : 'Masuk ke Sistem'}</span>
                                                 <ArrowRight className="w-3.5 h-3.5" />
                                             </a>
                                         </div>
@@ -1507,7 +1483,7 @@ export default function Welcome({
                             <ul className="space-y-2 text-xs font-medium">
                                 <li>
                                     <a href="#katalog" onClick={(e) => scrollToSection(e, 'katalog')} className="hover:text-blue-400 transition">
-                                        Katalog Toko Customer
+                                        Katalog Terbuka Produk
                                     </a>
                                 </li>
                                 <li>
@@ -1545,7 +1521,7 @@ export default function Welcome({
                                 </a>
                                 <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400">
                                     <span className="text-slate-300 font-semibold block mb-0.5">Simulasi Akun Demo:</span>
-                                    Fitur akun demo (Admin, Manajer, Staff, Customer) tersedia langsung di dalam halaman login resmi.
+                                    Fitur akun demo (Admin, Manajer, Staff Gudang) tersedia langsung di dalam halaman login resmi.
                                 </div>
                             </div>
                         </div>

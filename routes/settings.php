@@ -15,6 +15,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::match(['post', 'patch'], 'settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::post('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
+    Route::delete('invitations/{invitation}/decline', [TeamInvitationController::class, 'decline'])->name('invitations.decline');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

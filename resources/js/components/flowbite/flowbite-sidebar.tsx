@@ -17,10 +17,6 @@ import {
     ChevronLeft,
     Power,
     User as UserIcon,
-    ShoppingBag,
-    Store,
-    Receipt,
-    RotateCcw,
     Star,
     StickyNote,
     Wallet
@@ -132,46 +128,6 @@ export function FlowbiteSidebar({
             badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300',
             roles: ['admin', 'manajer_gudang', 'staff_gudang'],
         },
-
-        // Tab Khusus Customer (Pelanggan)
-        {
-            id: 'catalog',
-            label: 'Katalog Produk (Belanja)',
-            icon: Store,
-            badge: productsCount > 0 ? `${productsCount}` : null,
-            badgeColor: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-            roles: ['customer'],
-        },
-        {
-            id: 'my_orders',
-            label: 'Pesanan & Pembayaran',
-            icon: Receipt,
-            badge: null,
-            roles: ['customer'],
-        },
-        {
-            id: 'my_refunds',
-            label: 'Pengajuan Refund',
-            icon: RotateCcw,
-            badge: null,
-            roles: ['customer'],
-        },
-        // Tab Manajemen Pesanan & Refund untuk Admin, Manajer, dan Staff Gudang
-        {
-            id: 'orders_management',
-            label: 'Pesanan Customer',
-            icon: ShoppingBag,
-            badge: null,
-            roles: ['admin', 'manajer_gudang', 'staff_gudang'],
-        },
-        {
-            id: 'refunds_management',
-            label: 'Pusat Refund Customer',
-            icon: RotateCcw,
-            badge: 'Approval',
-            badgeColor: 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-300',
-            roles: ['admin', 'manajer_gudang', 'staff_gudang'],
-        },
         {
             id: 'users',
             label: 'Manajemen User',
@@ -192,7 +148,7 @@ export function FlowbiteSidebar({
             label: 'Profil Saya',
             icon: UserIcon,
             badge: null,
-            roles: ['admin', 'manajer_gudang', 'staff_gudang', 'customer'],
+            roles: ['admin', 'manajer_gudang', 'staff_gudang'],
         },
     ];
 
@@ -201,7 +157,7 @@ export function FlowbiteSidebar({
     return (
         <aside
             id="logo-sidebar"
-            className={`fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 ease-in-out ${isOpen
+            className={`fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 ease-in-out print:hidden ${isOpen
                 ? 'w-64 translate-x-0 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 shadow-lg md:shadow-none'
                 : '-translate-x-full md:translate-x-0 md:w-20 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700'
                 }`}

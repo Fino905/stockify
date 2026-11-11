@@ -21,7 +21,6 @@ class QuickSwitchController extends Controller
             'manager' => 'manajer_gudang',
             'staff' => 'staff_gudang',
             'staff_gudang' => 'staff_gudang',
-            'customer' => 'customer',
         ];
 
         $key = strtolower(str_replace([' ', '-'], '_', $role));

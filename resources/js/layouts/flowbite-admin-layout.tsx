@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import { FlowbiteNavbar } from '@/components/flowbite/flowbite-navbar';
 import { FlowbiteSidebar } from '@/components/flowbite/flowbite-sidebar';
+import { AlertToastBanner } from '@/components/common/alert-toast-banner';
 
 interface FlowbiteAdminLayoutProps {
     children: React.ReactNode;
@@ -75,7 +76,12 @@ export default function FlowbiteAdminLayout({
     const showLoader = isPageLoading || isTabLoading;
 
     return (
-        <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans antialiased text-gray-900 dark:text-gray-100 relative">
+        <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans antialiased text-gray-900 dark:text-gray-100 relative print:bg-white print:min-h-0 print:h-auto print:static">
+            {/* Global Alert Notification Toast Banner */}
+            <div className="print:hidden">
+                <AlertToastBanner />
+            </div>
+
             {/* Top Minimalist Page Loading Bar */}
             {showLoader && (
                 <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-gray-200 dark:bg-gray-800 overflow-hidden print:hidden">
@@ -125,8 +131,8 @@ export default function FlowbiteAdminLayout({
             </div>
 
             {/* Main Content Area with fluid width when sidebar is toggled */}
-            <main className={`px-4 md:px-6 pb-6 md:pb-8 pt-24 md:pt-24 print:pt-0 print:pb-0 print:px-0 print:m-0 print:ml-0 transition-[margin] duration-300 ease-in-out ${sidebarOpen ? 'md:ml-64 print:ml-0' : 'md:ml-20 ml-0 print:ml-0'}`}>
-                <div className="max-w-7xl mx-auto space-y-6 print:max-w-full print:space-y-4">
+            <main className={`px-4 md:px-6 pb-6 md:pb-8 pt-24 md:pt-24 print:pt-0 print:pb-0 print:px-0 print:m-0 print:ml-0 print:w-full print:max-w-full print:static transition-[margin] duration-300 ease-in-out ${sidebarOpen ? 'md:ml-64 print:ml-0' : 'md:ml-20 ml-0 print:ml-0'}`}>
+                <div className="max-w-7xl mx-auto space-y-6 print:max-w-full print:space-y-4 print:m-0 print:p-0">
                     {children}
                 </div>
             </main>

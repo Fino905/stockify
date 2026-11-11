@@ -15,8 +15,6 @@ import {
     EyeOff, 
     ShieldCheck, 
     ArrowRight, 
-    ShoppingBag, 
-    Receipt, 
     User,
     CheckCircle2
 } from 'lucide-react';
@@ -80,7 +78,7 @@ export default function Register({
 
     return (
         <div className="min-h-screen bg-slate-50 flex font-sans selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
-            <Head title={`Daftar Akun Customer - ${appSettings.appName || 'Stockify'} Warehouse OS`} />
+            <Head title={`Daftar Akun Staff Gudang - ${appSettings.appName || 'Stockify'} Warehouse OS`} />
 
             {/* Left Column: Visual Showcase (Identik dengan Login Page) */}
             <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white flex-col justify-between p-12 border-r border-slate-800/80 overflow-hidden select-none">
@@ -122,27 +120,27 @@ export default function Register({
                         </div>
                         <div className="flex flex-col">
                             <span className="font-black text-lg text-white tracking-tight">{appSettings.appName || 'Stockify'}<span className="text-blue-400">.</span></span>
-                            <span className="text-[10px] text-slate-400 font-medium">Customer Portal</span>
+                            <span className="text-[10px] text-slate-400 font-medium">Warehouse Portal</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Middle Content: Tagline and Customer Benefits */}
+                {/* Middle Content: Tagline and Staff Benefits */}
                 <div className="relative z-10 max-w-lg my-auto py-8">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-semibold mb-5 backdrop-blur-md">
                         <span className="w-2 h-2 rounded-full bg-blue-400" />
-                        <span>Akses Eksklusif Pelanggan &amp; Mitra Toko</span>
+                        <span>Akses Sistem Internal Pergudangan &amp; Logistik</span>
                     </div>
 
                     <h2 className="text-3xl xl:text-4xl font-black text-white leading-tight tracking-tight">
-                        Katalog Inventaris &amp; Pemesanan Belanja{' '}
+                        Registrasi Akun Baru{' '}
                         <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-sky-300 bg-clip-text text-transparent">
-                            Langsung dari Gudang.
+                            Staf Operasional Gudang.
                         </span>
                     </h2>
 
                     <p className="mt-4 text-slate-300 text-sm leading-relaxed">
-                        Daftarkan akun pelanggan Anda untuk memantau ketersediaan stok fisik barang secara akurat, bertransaksi aman, dan mendapatkan laporan status pesanan secara transparan.
+                        Daftarkan akun staf baru untuk mengelola inventaris fisik, mencatat mutasi barang masuk &amp; keluar, dan berkolaborasi secara real-time.
                     </p>
 
                 </div>
@@ -152,7 +150,7 @@ export default function Register({
                     <span>{appSettings.appName || 'Stockify'} Warehouse OS</span>
                     <span className="flex items-center gap-2 text-emerald-400 font-semibold">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        Layanan Pelanggan Aktif
+                        Layanan Gudang Aktif
                     </span>
                 </div>
             </div>
@@ -207,23 +205,23 @@ export default function Register({
                                 <span>Registrasi Akun Baru</span>
                             </div>
                             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-                                Daftar Akun Customer
+                                Daftar Akun Staff Gudang
                             </h1>
                             <p className="text-xs text-slate-500 mt-1">
-                                Buat akun belanja untuk mengecek stok gudang dan memesan langsung.
+                                Buat akun staf operasional untuk mencatat penerimaan dan pengeluaran barang.
                             </p>
                         </div>
 
-                        {/* Customer Role Highlight (Clean Slate Box) */}
+                        {/* Staff Role Highlight (Clean Slate Box) */}
                         <div className="mb-5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                                    <ShoppingBag className="w-3.5 h-3.5 text-white" />
+                                    <ShieldCheck className="w-3.5 h-3.5 text-white" />
                                 </div>
                                 <span className="font-medium text-slate-700">Peran Akun:</span>
                             </div>
                             <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
-                                Customer (Pembeli)
+                                Staff Gudang (Operasional)
                             </span>
                         </div>
 
@@ -282,7 +280,7 @@ export default function Register({
                                                 required
                                                 tabIndex={2}
                                                 autoComplete="email"
-                                                placeholder="customer@stockify.test"
+                                                placeholder="staff@stockify.test"
                                                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-500/15 transition-all"
                                             />
                                         </div>
@@ -366,7 +364,7 @@ export default function Register({
                                                 </span>
                                             ) : (
                                                 <>
-                                                    <span>Daftar Akun Customer</span>
+                                                    <span>Daftar Akun Baru</span>
                                                     <ArrowRight className="w-4 h-4 text-blue-200" />
                                                 </>
                                             )}

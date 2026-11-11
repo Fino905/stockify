@@ -9,9 +9,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Tambahkan 'customer' ke ENUM role pada tabel users (khusus MySQL)
+        // 1. Pastikan ENUM role pada tabel users konsisten 3 role gudang (khusus MySQL)
         if (DB::getDriverName() !== 'sqlite') {
-            DB::statement("ALTER TABLE `users` MODIFY COLUMN `role` ENUM('admin', 'manajer_gudang', 'staff_gudang', 'customer') NOT NULL DEFAULT 'staff_gudang'");
+            DB::statement("ALTER TABLE `users` MODIFY COLUMN `role` ENUM('admin', 'manajer_gudang', 'staff_gudang') NOT NULL DEFAULT 'staff_gudang'");
         }
 
         // 2. Tabel orders

@@ -91,8 +91,6 @@ class ProductService
         return DB::transaction(function () use ($product) {
             $product->transactions()->delete();
             $product->attributes()->delete();
-            $product->orders()->delete();
-            $product->feedbacks()->delete();
 
             return $this->productRepository->delete($product);
         });
@@ -159,11 +157,6 @@ class ProductService
 
             // Jika stok 0 sudah melebihi batas $days hari, lakukan auto-delete
             if ($zeroSince->lte($cutoff)) {
-                // Cegah penghapusan produk jika masih ada permohonan refund yang sedang ditinjau
-                if ($product->orders()->where('order_status', 'refund_pending')->exists()) {
-                    continue;
-                }
-
                 $productName = $product->name;
                 $this->deleteProduct($product);
                 $deleted[] = $productName;

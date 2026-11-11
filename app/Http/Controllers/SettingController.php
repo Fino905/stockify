@@ -43,6 +43,8 @@ class SettingController extends Controller
             'address' => 'nullable|string|max:500',
             'app_info' => 'nullable|string|max:1000',
             'appInfo' => 'nullable|string|max:1000',
+            'groq_api_key' => 'nullable|string|max:255',
+            'groqApiKey' => 'nullable|string|max:255',
             'logo' => $request->hasFile('logo')
                 ? 'required|image|mimes:jpeg,png,jpg,webp,svg|max:2048'
                 : 'nullable|string|max:1000',
@@ -75,6 +77,11 @@ class SettingController extends Controller
         $appInfo = $validated['app_info'] ?? $validated['appInfo'] ?? null;
         if ($appInfo !== null) {
             Setting::set('app_info', $appInfo);
+        }
+
+        $groqApiKey = $validated['groq_api_key'] ?? $validated['groqApiKey'] ?? null;
+        if ($groqApiKey !== null) {
+            Setting::set('groq_api_key', trim($groqApiKey));
         }
 
         if ($request->boolean('remove_logo')) {

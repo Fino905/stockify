@@ -12,8 +12,6 @@ import {
     Shield,
     Clock,
     CheckCircle2,
-    ShoppingBag,
-    Receipt,
     Wallet
 } from 'lucide-react';
 
@@ -50,7 +48,6 @@ interface ManagerStockOverviewProps {
     };
     lowStockItems: ManagerLowStockItem[];
     transactions: ManagerTransactionItem[];
-    pendingOrdersCount?: number;
     onSelectTab: (tab: string) => void;
     onOpenRestock: (productId?: number) => void;
     onOpenStockOut: () => void;
@@ -61,7 +58,6 @@ export function ManagerStockOverview({
     stats,
     lowStockItems = [],
     transactions = [],
-    pendingOrdersCount = 0,
     onSelectTab,
     onOpenRestock,
     onOpenStockOut,
@@ -126,36 +122,6 @@ export function ManagerStockOverview({
                     </button>
                 </div>
             </div>
-
-            {/* NOTIFIKASI PESANAN CUSTOMER MENUNGGU VERIFIKASI BUKTI TRANSFER (KHUSUS MANAJER GUDANG) */}
-            {pendingOrdersCount > 0 && (
-                <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border-2 border-amber-300 dark:border-amber-700/60 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-in fade-in">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                            <ShoppingBag className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2">
-                                <span>{pendingOrdersCount} Pesanan Baru Menunggu Verifikasi Bukti Transaksi</span>
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-200 text-amber-900 dark:bg-amber-900 dark:text-amber-200 animate-pulse">
-                                    Perlu Tindakan
-                                </span>
-                            </h4>
-                            <p className="text-xs text-gray-600 dark:text-gray-300">
-                                Pelanggan telah mengirimkan pesanan dan melampirkan bukti transfer. Periksa bukti dan sahkan pesanan untuk memotong stok fisik.
-                            </p>
-                        </div>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => onSelectTab('orders_management')}
-                        className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs inline-flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
-                    >
-                        <Receipt className="w-4 h-4" />
-                        <span>Periksa Bukti & Konfirmasi →</span>
-                    </button>
-                </div>
-            )}
 
             {/* 3 KARTU UTAMA SESUAI KETENTUAN: STOK MENIPIS, BARANG MASUK HARI INI, BARANG KELUAR HARI INI */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

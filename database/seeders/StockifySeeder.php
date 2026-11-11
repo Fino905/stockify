@@ -4,9 +4,6 @@ namespace Database\Seeders;
 
 use App\Actions\Teams\CreateTeam;
 use App\Models\Category;
-use App\Models\Order;
-use App\Models\OrderFeedback;
-use App\Models\OrderRefund;
 use App\Models\Product;
 use App\Models\StockTransaction;
 use App\Models\Supplier;
@@ -60,19 +57,9 @@ class StockifySeeder extends Seeder
             ]
         );
 
-        $customer = User::firstOrCreate(
-            ['email' => 'customer@stockify.test'],
-            [
-                'name' => 'Dewi Pelanggan',
-                'password' => Hash::make('password'),
-                'role' => 'customer',
-                'email_verified_at' => now(),
-            ]
-        );
-
         // Buat tim personal untuk setiap user demo jika belum memiliki
         $createTeam = app(CreateTeam::class);
-        foreach ([$admin, $manajer, $managerAlias, $staff, $customer] as $u) {
+        foreach ([$admin, $manajer, $managerAlias, $staff] as $u) {
             if (! $u->current_team_id) {
                 $team = $createTeam->handle($u, $u->name."'s Team", isPersonal: true);
                 $u->update(['current_team_id' => $team->id]);
@@ -224,56 +211,7 @@ class StockifySeeder extends Seeder
             ]);
         }
 
-        // 6. Transaksi Pembelian Demo oleh Customer
-        if (Order::count() === 0) {
-            $order1 = Order::create([
-                'order_number' => 'ORD-20261019-X892A',
-                'user_id' => $customer->id,
-                'product_id' => $prd1->id,
-                'staff_id' => $staff->id,
-                'quantity' => 10,
-                'unit_price' => $prd1->selling_price,
-                'total_price' => $prd1->selling_price * 10,
-                'payment_method' => 'qris',
-                'payment_status' => 'paid',
-                'payment_reference' => 'SIM-PAY-882910',
-                'order_status' => 'completed',
-                'notes' => 'Tolong dicek bautnya jangan sampai ada yang karatan.',
-            ]);
-
-            OrderFeedback::create([
-                'order_id' => $order1->id,
-                'product_id' => $prd1->id,
-                'user_id' => $customer->id,
-                'rating' => 5,
-                'comment' => 'Barang sangat bagus, packing kuat dan rapi dari staff gudang Ahmad Fauzi. Mantap!',
-            ]);
-
-            $order2 = Order::create([
-                'order_number' => 'ORD-20261018-K410Z',
-                'user_id' => $customer->id,
-                'product_id' => $prd2->id,
-                'staff_id' => $staff->id,
-                'quantity' => 1,
-                'unit_price' => $prd2->selling_price,
-                'total_price' => $prd2->selling_price * 1,
-                'payment_method' => 'bca_va',
-                'payment_status' => 'paid',
-                'payment_reference' => 'SIM-PAY-592810',
-                'order_status' => 'refund_pending',
-                'notes' => 'Pengiriman plat galvanis lembaran',
-            ]);
-
-            OrderRefund::create([
-                'order_id' => $order2->id,
-                'user_id' => $customer->id,
-                'reason' => 'Barang Rusak/Cacat saat Diterima',
-                'description' => 'Ada goresan dan penyok di sudut lembaran plat saat serah terima barang dari gudang.',
-                'status' => 'pending',
-            ]);
-        }
-
-        // 7. 50 Produk Berbagai Kategori dan 10 Supplier Baru
+        // 6. 50 Produk Berbagai Kategori dan 10 Supplier Baru
         $this->call(FiftyProductsAndTenSuppliersSeeder::class);
     }
 }

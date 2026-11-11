@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'vision_model' => env('GROQ_VISION_MODEL', 'qwen/qwen3.8-27b'),
+    ],
+
 ];

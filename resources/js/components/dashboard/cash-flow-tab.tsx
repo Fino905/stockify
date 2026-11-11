@@ -109,12 +109,12 @@ export function CashFlowTab({
         { id: 'sewa', label: 'Sewa Gudang & Tempat' },
         { id: 'transportasi', label: 'Transportasi & Bahan Bakar (BBM)' },
         { id: 'perawatan', label: 'Perawatan & Servis Alat Gudang' },
-        { id: 'refund', label: 'Pengembalian Dana (Refund Customer)' },
+        { id: 'refund', label: 'Pengembalian Dana / Retur Barang' },
         { id: 'lainnya', label: 'Pengeluaran Lainnya' },
     ];
 
     const inCategories = [
-        { id: 'penjualan', label: 'Penjualan Produk (Pesanan Pelanggan)' },
+        { id: 'penjualan', label: 'Penjualan / Distribusi Barang Keluar' },
         { id: 'modal', label: 'Suntikan Modal Tambahan' },
         { id: 'klaim_supplier', label: 'Pengembalian / Klaim dari Supplier' },
         { id: 'lainnya', label: 'Pemasukan Lainnya' },
@@ -389,10 +389,10 @@ export function CashFlowTab({
                         className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs rounded-xl px-3 py-2 text-gray-800 dark:text-gray-200 font-medium"
                     >
                         <option value="all">Semua Kategori</option>
-                        <option value="penjualan">Penjualan Customer</option>
+                        <option value="penjualan">Penjualan / Distribusi Barang</option>
                         <option value="operasional">Biaya Operasional</option>
                         <option value="supplier">Pembayaran Supplier</option>
-                        <option value="refund">Refund Pelanggan</option>
+                        <option value="refund">Retur / Pengembalian Dana</option>
                         <option value="kemasan">Kemasan &amp; Packing</option>
                         <option value="gaji">Gaji &amp; Upah</option>
                         <option value="modal">Modal Tambahan</option>

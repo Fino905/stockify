@@ -146,8 +146,6 @@ export function FlowbiteNavbar({ onToggleSidebar, sidebarOpen, currentUser, onSe
                 return { label: 'Manajer Gudang', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300' };
             case 'staff_gudang':
                 return { label: 'Staff Gudang', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' };
-            case 'customer':
-                return { label: 'Customer (Pembeli)', color: 'bg-theme-primary-light text-theme-primary-text dark:bg-blue-900 dark:text-blue-300' };
             default:
                 return { label: 'Tamu', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
         }
@@ -156,7 +154,7 @@ export function FlowbiteNavbar({ onToggleSidebar, sidebarOpen, currentUser, onSe
     const roleInfo = getRoleBadge(currentUser?.role);
 
     return (
-        <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700 print:hidden">
             <div className="px-2.5 py-2.5 sm:px-4 lg:px-5 lg:pl-3">
                 <div className="flex items-center justify-between">
                     {/* Left: Mobile hamburger & Logo */}
@@ -455,18 +453,6 @@ export function FlowbiteNavbar({ onToggleSidebar, sidebarOpen, currentUser, onSe
                                                 >
                                                     <span>3. Staff Gudang</span>
                                                     <span className="text-[10px] opacity-75">Masuk & Keluar</span>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleSwitchRole('customer')}
-                                                    className={`w-full text-left px-2.5 py-1.5 text-xs rounded-md transition-colors flex items-center justify-between ${
-                                                        currentUser?.role === 'customer' 
-                                                            ? 'bg-theme-primary text-white font-semibold' 
-                                                            : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                                    }`}
-                                                >
-                                                    <span>4. Customer</span>
-                                                    <span className="text-[10px] opacity-75">Beli & Refund</span>
                                                 </button>
                                             </div>
                                         </div>

@@ -45,7 +45,7 @@ test('login page renders with appSettings and canResetPassword', function () {
     );
 });
 
-test('login blade view renders with landing page blue theme and 4 demo roles', function () {
+test('login blade view renders with landing page blue theme and 3 demo roles', function () {
     $view = $this->view('auth.login', [
         'canResetPassword' => true,
         'appSettings' => [
@@ -59,13 +59,13 @@ test('login blade view renders with landing page blue theme and 4 demo roles', f
     $view->assertSee('role-tab-admin');
     $view->assertSee('role-tab-manajer');
     $view->assertSee('role-tab-staff');
-    $view->assertSee('role-tab-customer');
+    $view->assertDontSee('role-tab-customer');
     $view->assertSee('from-blue-600 to-indigo-600');
     $view->assertSee('1-Klik (Admin)');
-    $view->assertSee('Daftar Akun Customer');
+    $view->assertSee('Daftar Akun Staff Gudang');
 });
 
-test('register blade view renders with landing page blue theme and customer registration', function () {
+test('register blade view renders with landing page blue theme and staff registration', function () {
     $view = $this->view('auth.register', [
         'appSettings' => [
             'appName' => 'Stockify Test',
@@ -75,9 +75,10 @@ test('register blade view renders with landing page blue theme and customer regi
     ]);
 
     $view->assertSee('Stockify Test');
-    $view->assertSee('Daftar Akun Customer');
+    $view->assertSee('Daftar Akun Staff Gudang');
     $view->assertSee('hidden lg:flex lg:w-1/2');
-    $view->assertSee('Customer Portal');
+    $view->assertSee('Warehouse Portal');
+    $view->assertDontSee('Customer Portal');
     $view->assertSee('from-blue-600 to-indigo-600');
     $view->assertSee('Kembali ke Beranda');
     $view->assertSee('Masuk ke Sistem');

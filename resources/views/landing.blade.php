@@ -88,13 +88,13 @@
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"/></svg>
                     </a>
                     <a href="{{ route('register') }}" class="btn-press inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4.5 py-2.5 text-xs sm:text-sm font-semibold text-gray-700 shadow-xs transition hover:bg-gray-50">
-                        Daftar Customer
+                        Daftar Akun Baru
                     </a>
                 </div>
 
                 <div class="flex flex-wrap gap-x-4 gap-y-2 pt-2 text-xs font-medium text-gray-600">
                     <span class="inline-flex items-center gap-1.5"><span class="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Stok minimum terpantau</span>
-                    <span class="inline-flex items-center gap-1.5"><span class="flex h-4 w-4 items-center justify-center rounded-full bg-blue-100 text-blue-700"><svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Akses sesuai 4 peran</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="flex h-4 w-4 items-center justify-center rounded-full bg-blue-100 text-blue-700"><svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Akses sesuai 3 peran gudang</span>
                     <span class="inline-flex items-center gap-1.5"><span class="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-100 text-indigo-700"><svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Laporan & ekspor data</span>
                 </div>
             </div>
@@ -190,10 +190,10 @@
         <section id="peran" class="px-4 py-16 sm:px-6 lg:py-20 bg-gray-50">
             <div class="mx-auto max-w-7xl">
                 <div class="mx-auto max-w-2xl text-center">
-                    <span class="inline-flex rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-xs font-bold text-blue-700">KOLABORASI 4 PERAN</span>
+                    <span class="inline-flex rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-xs font-bold text-blue-700">KOLABORASI 3 PERAN GUDANG</span>
                     <h2 class="mt-4 text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">Hak Akses Sesuai Wewenang</h2>
                 </div>
-                <div class="mt-10 grid gap-4 lg:grid-cols-4">
+                <div class="mt-10 grid gap-4 lg:grid-cols-3">
                     <article class="card-lift rounded-2xl border border-gray-200 bg-white p-5 shadow-2xs cursor-default">
                         <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-xs font-extrabold text-blue-800">A</span>
                         <h3 class="mt-3 text-base font-bold text-gray-900">Admin</h3>
@@ -208,11 +208,6 @@
                         <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-xs font-extrabold text-amber-800">S</span>
                         <h3 class="mt-3 text-base font-bold text-gray-900">Staff Gudang</h3>
                         <p class="mt-1 text-xs text-gray-600 leading-relaxed font-medium">Operasional harian pemeriksaan barang masuk dan penyiapan barang keluar.</p>
-                    </article>
-                    <article class="card-lift rounded-2xl border border-gray-200 bg-white p-5 shadow-2xs cursor-default">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-xs font-extrabold text-indigo-800">C</span>
-                        <h3 class="mt-3 text-base font-bold text-gray-900">Customer</h3>
-                        <p class="mt-1 text-xs text-gray-600 leading-relaxed font-medium">Katalog belanja produk, pembayaran simulasi, rating/feedback, dan refund.</p>
                     </article>
                 </div>
             </div>
@@ -257,7 +252,7 @@
                         </span>
                     </a>
                     <p class="text-gray-400 text-xs leading-relaxed max-w-sm">
-                        Platform manajemen pergudangan terpadu dengan kontrol inventaris presisi, pelacakan atribut fleksibel, audit stock opname fisik otomatis, serta otorisasi multi-role untuk Admin, Manajer Gudang, Staff Lapangan, dan Customer.
+                        Platform manajemen pergudangan terpadu dengan kontrol inventaris presisi, pelacakan atribut fleksibel, audit stock opname fisik otomatis, serta otorisasi multi-role untuk Admin, Manajer Gudang, dan Staff Gudang.
                     </p>
                     <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800/90 border border-gray-700 text-gray-300 text-[11px] font-medium shadow-xs">
                         <span class="relative flex h-2 w-2">
@@ -298,7 +293,6 @@
                         <li><a href="{{ route('login') }}" class="hover:text-blue-400 transition-colors">Portal Administrator</a></li>
                         <li><a href="{{ route('login') }}" class="hover:text-blue-400 transition-colors">Portal Manajer Gudang</a></li>
                         <li><a href="{{ route('login') }}" class="hover:text-blue-400 transition-colors">Portal Staff Lapangan</a></li>
-                        <li><a href="{{ route('login') }}" class="hover:text-blue-400 transition-colors">Katalog Toko Customer</a></li>
                     </ul>
                 </div>
 

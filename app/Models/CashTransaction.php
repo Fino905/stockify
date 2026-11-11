@@ -30,11 +30,6 @@ class CashTransaction extends Model
         'amount' => 'float',
     ];
 
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(Order::class, 'order_id');
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
