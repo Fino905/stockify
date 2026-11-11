@@ -131,9 +131,6 @@ class DashboardService
             ['month' => 'Okt', 'masuk' => max(50, $totalStockIn), 'keluar' => max(30, $totalStockOut)],
         ];
 
-        $orders = collect([]);
-        $refundRequests = collect([]);
-
         $staffMembers = User::where('role', 'staff_gudang')->get(['id', 'name', 'email'])->values();
 
         $warehouseNotes = WarehouseNote::with('user:id,name')
@@ -165,8 +162,6 @@ class DashboardService
                 'proof_image' => $c->proof_image,
                 'notes' => $c->notes,
                 'user_name' => $c->user?->name ?? 'Sistem',
-                'order_id' => $c->order_id,
-                'order_number' => null,
                 'created_at' => $c->created_at ? $c->created_at->format('d M Y, H:i') : '-',
             ];
         })->values();
@@ -237,8 +232,6 @@ class DashboardService
                 'today_stock_in' => $todayStockIn,
                 'today_stock_out' => $todayStockOut,
                 'low_stock_count' => $lowStockItems->count(),
-                'total_orders' => 0,
-                'pending_refunds_count' => 0,
                 'total_cash_in' => $totalCashIn,
                 'total_cash_out' => $totalCashOut,
                 'net_cash_balance' => $netCashBalance,
@@ -253,10 +246,8 @@ class DashboardService
             'products' => $products,
             'transactions' => $transactions,
             'users' => $users,
-            'orders' => $orders,
             'warehouseNotes' => $warehouseNotes,
             'cashTransactions' => $cashTransactions,
-            'refundRequests' => $refundRequests,
             'staffMembers' => $staffMembers,
             'lowStockItems' => $lowStockItems,
             'pendingInTasks' => $pendingInTasks,

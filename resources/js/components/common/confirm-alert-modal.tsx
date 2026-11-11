@@ -29,8 +29,8 @@ export interface ConfirmAlertModalProps {
         quantity?: number;
         unit?: string;
         price?: number;
-        orderNumber?: string;
-        customerName?: string;
+        referenceNumber?: string;
+        destinationOrPartner?: string;
         actionLabel?: string;
     };
     itemDetails?: {
@@ -191,19 +191,19 @@ export function ConfirmAlertModal({
                                         </span>
                                     </div>
                                 )}
-                                {productDetails.orderNumber && (
+                                {productDetails.referenceNumber && (
                                     <div>
-                                        <span className="text-gray-500 block">Nomor Pesanan:</span>
+                                        <span className="text-gray-500 block">No. Referensi:</span>
                                         <span className="font-mono font-bold text-gray-800 dark:text-gray-200">
-                                            #{productDetails.orderNumber}
+                                            {productDetails.referenceNumber}
                                         </span>
                                     </div>
                                 )}
-                                {productDetails.customerName && (
+                                {productDetails.destinationOrPartner && (
                                     <div>
-                                        <span className="text-gray-500 block">Customer / Pemesan:</span>
+                                        <span className="text-gray-500 block">Tujuan / Mitra:</span>
                                         <span className="font-semibold text-gray-800 dark:text-gray-200">
-                                            {productDetails.customerName}
+                                            {productDetails.destinationOrPartner}
                                         </span>
                                     </div>
                                 )}

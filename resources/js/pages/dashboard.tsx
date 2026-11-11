@@ -160,8 +160,6 @@ interface Props {
         date: string;
         notes: string | null;
     }>;
-    orders?: Array<any>;
-    refundRequests?: Array<any>;
     staffMembers?: Array<any>;
     cashTransactions?: Array<any>;
     notifications?: any;
@@ -195,8 +193,6 @@ export default function Dashboard({
     lowStockItems = [],
     pendingInTasks = [],
     pendingOutTasks = [],
-    orders = [],
-    refundRequests = [],
     staffMembers = [],
     warehouseNotes = [],
     cashTransactions = [],

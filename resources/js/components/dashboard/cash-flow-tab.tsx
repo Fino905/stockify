@@ -43,8 +43,6 @@ export interface CashTransactionItem {
     proof_image?: string | null;
     notes?: string | null;
     user_name: string;
-    order_id?: number | null;
-    order_number?: string | null;
     created_at: string;
 }
 
@@ -209,8 +207,7 @@ export function CashFlowTab({
             const matchDesc = (item.description || '').toLowerCase().includes(q);
             const matchCategory = (item.category || '').toLowerCase().includes(q);
             const matchUser = (item.user_name || '').toLowerCase().includes(q);
-            const matchOrder = (item.order_number || '').toLowerCase().includes(q);
-            return matchNumber || matchDesc || matchCategory || matchUser || matchOrder;
+            return matchNumber || matchDesc || matchCategory || matchUser;
         }
 
         return true;
@@ -457,11 +454,6 @@ export function CashFlowTab({
                                             <td className="p-4">
                                                 <div className="font-mono font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
                                                     <span>{trx.transaction_number}</span>
-                                                    {trx.order_number && (
-                                                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 font-normal">
-                                                            #{trx.order_number}
-                                                        </span>
-                                                    )}
                                                 </div>
                                                 <div className="text-[11px] text-gray-400 mt-0.5 flex items-center gap-1">
                                                     <Clock className="w-3 h-3" />

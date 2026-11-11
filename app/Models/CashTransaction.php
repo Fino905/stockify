@@ -20,7 +20,6 @@ class CashTransaction extends Model
         'date',
         'description',
         'proof_image',
-        'order_id',
         'user_id',
         'notes',
     ];
