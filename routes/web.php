@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\CashTransactionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -68,9 +67,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/stock-opname', [StockTransactionController::class, 'stockOpname'])->name('stock.opname');
         Route::post('/opnames', [StockTransactionController::class, 'stockOpname'])->name('opnames.store');
         Route::match(['post', 'patch'], '/transactions/{transaction}/confirm', [StockTransactionController::class, 'confirm'])->name('transactions.confirm');
-
-        // Hapus Catatan Buku Kas (Khusus Manajemen)
-        Route::delete('/cash-transactions/{cashTransaction}', [CashTransactionController::class, 'destroy'])->name('cash-transactions.destroy');
     });
 
     // Operasional Gudang: Khusus Staff Gudang, Manajer, Admin
@@ -78,9 +74,6 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/transactions/{transaction}/status', [StockTransactionController::class, 'updateStatus'])->name('transactions.status');
         Route::match(['post', 'patch'], '/transactions/{transaction}/prepare', [StockTransactionController::class, 'prepare'])->name('transactions.prepare');
         Route::match(['post', 'patch'], '/transactions/{transaction}/reject', [StockTransactionController::class, 'reject'])->name('transactions.reject');
-
-        // Pencatatan Kas Masuk / Kas Keluar (Termasuk Kas Kecil Gudang oleh Staf)
-        Route::post('/cash-transactions', [CashTransactionController::class, 'store'])->name('cash-transactions.store');
 
         // Catatan Cepat Gudang (Warehouse Notes)
         Route::post('/warehouse-notes', [WarehouseNoteController::class, 'store'])->name('warehouse-notes.store');
@@ -98,7 +91,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/suppliers', [DashboardController::class, '__invoke'])->name('suppliers.index');
     Route::get('/categories', [DashboardController::class, '__invoke'])->name('categories.index');
     Route::get('/reports', [DashboardController::class, '__invoke'])->name('reports.index');
-    Route::get('/cash-flow', [DashboardController::class, '__invoke'])->name('cash-flow.index');
     Route::get('/attribute-definitions', [DashboardController::class, '__invoke'])->name('attribute-definitions.index');
 });
 

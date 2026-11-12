@@ -5,7 +5,6 @@ import { StaffTaskOverview } from '@/components/dashboard/staff';
 import { ManagerStockOverview } from '@/components/dashboard/manager';
 import { AdminAnalyticsOverview } from '@/components/dashboard/admin';
 import { WarehouseNotesTab } from '@/components/dashboard/warehouse-notes-tab';
-import { CashFlowTab } from '@/components/dashboard/cash-flow-tab';
 import { ProfileTab } from '@/components/dashboard/profile-tab';
 import { ConfirmAlertModal } from '@/components/common/confirm-alert-modal';
 import { triggerAlertToast } from '@/components/common/alert-toast-banner';
@@ -161,7 +160,7 @@ interface Props {
         notes: string | null;
     }>;
     staffMembers?: Array<any>;
-    cashTransactions?: Array<any>;
+    warehouseNotes?: Array<any>;
     notifications?: any;
     currentUser?: {
         id: number;
@@ -179,7 +178,7 @@ interface Props {
         appInfo?: string;
         logo?: string | null;
         warehouseNotes?: Array<any>;
-    };
+    } | null;
 }
 
 export default function Dashboard({
@@ -195,7 +194,6 @@ export default function Dashboard({
     pendingOutTasks = [],
     staffMembers = [],
     warehouseNotes = [],
-    cashTransactions = [],
     notifications = null,
     currentUser = null,
     appSettings: initialAppSettings = null,
@@ -208,8 +206,7 @@ export default function Dashboard({
             if (tabParam) return tabParam;
 
             const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-            if (['products', 'categories', 'suppliers', 'transactions', 'opname', 'reports', 'users', 'settings', 'profile', 'warehouse_notes', 'cash_flow', 'cash-flow'].includes(path)) {
-                if (path === 'cash-flow') return 'cash_flow';
+            if (['products', 'categories', 'suppliers', 'transactions', 'opname', 'reports', 'users', 'settings', 'profile', 'warehouse_notes'].includes(path)) {
                 return path;
             }
         }
@@ -218,7 +215,7 @@ export default function Dashboard({
     const [isTabLoading, setIsTabLoading] = useState(false);
 
     React.useEffect(() => {
-        if (userRole === 'staff_gudang' && !['dashboard', 'transactions', 'warehouse_notes', 'cash_flow', 'profile'].includes(activeTab)) {
+        if (userRole === 'staff_gudang' && !['dashboard', 'transactions', 'warehouse_notes', 'profile'].includes(activeTab)) {
             setActiveTab('dashboard');
         } else if (userRole === 'manajer_gudang' && ['categories', 'users', 'settings'].includes(activeTab)) {
             setActiveTab('dashboard');
@@ -554,7 +551,6 @@ export default function Dashboard({
         date: new Date().toISOString().split('T')[0],
         notes: '',
         status: 'completed',
-        record_cash_flow: true,
     });
     const [userForm, setUserForm] = useState({
         name: '',
@@ -571,7 +567,7 @@ export default function Dashboard({
         name: 'Ukuran',
         value: '',
     });
-    const [appSettings, setAppSettings] = useState(() => {
+    const [appSettings, setAppSettings] = useState<Record<string, any>>(() => {
         const defaults = {
             appName: initialAppSettings?.appName || 'Stockify',
             warehouseName: initialAppSettings?.warehouseName || 'Gudang Pusat Logistik Cikarang',
@@ -1374,7 +1370,6 @@ export default function Dashboard({
                                         {activeTab === 'transactions' && 'Riwayat Transaksi Stok'}
                                         {activeTab === 'opname' && 'Stock Opname (Pemeriksaan Fisik)'}
                                         {activeTab === 'reports' && 'Laporan Mutasi & Stok'}
-                                        {activeTab === 'cash_flow' && 'Buku Kas & Laporan Arus Kas'}
                                         {activeTab === 'warehouse_notes' && 'Catatan Cepat Operasional Gudang'}
                                         {activeTab === 'users' && 'Manajemen Pengguna & Hak Akses'}
                                         {activeTab === 'settings' && 'Pengaturan Umum Aplikasi'}
@@ -1433,7 +1428,7 @@ export default function Dashboard({
 
                                         <button
                                             type="button"
-                                            onClick={openStockOutModal}
+                                            onClick={() => openStockOutModal()}
                                             className="btn-press cascade-3 inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl cursor-pointer"
                                         >
                                             <ArrowUpFromLine className="w-3.5 h-3.5" />
@@ -3410,15 +3405,6 @@ export default function Dashboard({
                         </div>
                     )}
 
-                    {/* TAB MANAGEMENT: BUKU KAS & LAPORAN ARUS KAS */}
-                    {activeTab === 'cash_flow' && (
-                        <CashFlowTab 
-                            cashTransactions={cashTransactions} 
-                            stats={stats} 
-                            currentUser={currentUser} 
-                        />
-                    )}
-
                     {/* TAB PENGATURAN PROFIL & UPLOAD FOTO AVATAR */}
                     {activeTab === 'profile' && (
                         <ProfileTab currentUser={currentUser} />
@@ -3907,43 +3893,6 @@ export default function Dashboard({
                                     className="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 />
                             </div>
-
-                            {transactionType === 'in' && (
-                                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-2">
-                                    <label className="flex items-center gap-2 cursor-pointer select-none">
-                                        <input
-                                            type="checkbox"
-                                            checked={transactionForm.record_cash_flow !== false}
-                                            onChange={(e) => setTransactionForm({ ...transactionForm, record_cash_flow: e.target.checked })}
-                                            className="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500"
-                                        />
-                                        <span className="font-bold text-emerald-900 dark:text-emerald-200 text-xs">
-                                            Otomatis Catat Pengeluaran ke Buku Kas (Pembelian dari Supplier)
-                                        </span>
-                                    </label>
-                                    {transactionForm.record_cash_flow !== false && (
-                                        <div className="text-[11px] text-emerald-700 dark:text-emerald-300 space-y-1 pt-1 border-t border-emerald-200/60 dark:border-emerald-800/60">
-                                            {(() => {
-                                                const p = products.find(prod => String(prod.id) === String(transactionForm.product_id));
-                                                const price = p?.purchase_price ? Number(p.purchase_price) : 0;
-                                                const qty = Number(transactionForm.quantity) || 0;
-                                                return (
-                                                    <>
-                                                        <div className="flex justify-between">
-                                                            <span>Estimasi Harga Beli:</span>
-                                                            <span className="font-bold">Rp {price.toLocaleString('id-ID')} / unit</span>
-                                                        </div>
-                                                        <div className="flex justify-between font-bold">
-                                                            <span>Total Pengeluaran Kas:</span>
-                                                            <span className="text-emerald-800 dark:text-emerald-200">Rp {(price * qty).toLocaleString('id-ID')}</span>
-                                                        </div>
-                                                    </>
-                                                );
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
 
                             <div className="flex justify-end gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <button type="button" onClick={() => setShowTransactionModal(false)} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg">Batal</button>

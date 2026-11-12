@@ -18,8 +18,7 @@ import {
     Power,
     User as UserIcon,
     Star,
-    StickyNote,
-    Wallet
+    StickyNote
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -111,15 +110,6 @@ export function FlowbiteSidebar({
             badge: null,
             roles: ['admin', 'manajer_gudang'],
         },
-        {
-            id: 'cash_flow',
-            label: userRole === 'staff_gudang' ? 'Kas Kecil Gudang' : 'Buku Kas / Arus Kas',
-            icon: Wallet,
-            badge: userRole === 'staff_gudang' ? 'Petty Cash' : 'Keuangan',
-            badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300',
-            roles: ['admin', 'manajer_gudang', 'staff_gudang'],
-        },
-
         {
             id: 'warehouse_notes',
             label: 'Catatan Gudang',

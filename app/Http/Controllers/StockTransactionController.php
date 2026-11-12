@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CashTransaction;
 use App\Models\Product;
 use App\Models\StockTransaction;
 use App\Services\StockTransactionService;
@@ -24,8 +23,6 @@ class StockTransactionController extends Controller
             'date' => 'required|date',
             'notes' => 'nullable|string',
             'status' => 'nullable|in:pending,completed,cancelled',
-            'record_cash_flow' => 'nullable|boolean',
-            'custom_purchase_price' => 'nullable|numeric|min:0',
         ]);
 
         $user = $request->user();
@@ -33,50 +30,15 @@ class StockTransactionController extends Controller
         if ($user && $user->role === 'staff_gudang') {
             $validated['status'] = 'pending';
             $staffNote = "[Diajukan oleh Staff: {$user->name} - Menunggu Konfirmasi Admin/Management]";
-            if ($request->boolean('record_cash_flow')) {
-                $staffNote .= " [Opsi Buku Kas Aktif]";
-            }
             $validated['notes'] = trim(($validated['notes'] ?? '') . ' ' . $staffNote);
         }
 
-        $createdTrx = $this->transactionService->recordTransaction($validated, $user?->id);
-
-        // Jika barang masuk dan opsi catat buku kas dicentang:
-        $cashRecorded = false;
-        if ($validated['type'] === 'in' && $request->boolean('record_cash_flow')) {
-            $product = Product::with('supplier')->find($validated['product_id']);
-            if ($product) {
-                $unitPrice = (float) ($request->input('custom_purchase_price') ?: $product->purchase_price ?: 0);
-                $totalAmount = $unitPrice * $validated['quantity'];
-
-                if ($totalAmount > 0) {
-                    $yearMonth = date('Ym', strtotime($validated['date']));
-                    $countThisMonth = CashTransaction::where('transaction_number', 'like', "CSH-{$yearMonth}-%")->count();
-                    $trxNumber = sprintf("CSH-%s-SUP%03d", $yearMonth, $countThisMonth + 1);
-
-                    CashTransaction::create([
-                        'transaction_number' => $trxNumber,
-                        'type' => 'out',
-                        'category' => 'supplier',
-                        'amount' => $totalAmount,
-                        'date' => $validated['date'],
-                        'description' => "Pembelian Barang Masuk: {$product->name} ({$validated['quantity']} unit) dari " . ($product->supplier?->name ?? 'Supplier'),
-                        'notes' => "Harga Beli Satuan: Rp " . number_format($unitPrice, 0, ',', '.') . " | Terkait Mutasi Stok #{$createdTrx->id}",
-                        'user_id' => $user?->id ?? 1,
-                    ]);
-                    $cashRecorded = true;
-                }
-            }
-        }
+        $this->transactionService->recordTransaction($validated, $user?->id);
 
         $actionText = $validated['type'] === 'in' ? 'penerimaan barang masuk' : 'pengeluaran barang keluar';
         $message = ($user && $user->role === 'staff_gudang')
             ? "Transaksi {$actionText} berhasil diajukan dan berstatus PENDING (Menunggu konfirmasi Admin/Management)!"
             : "Transaksi {$actionText} berhasil dicatat!";
-
-        if ($cashRecorded) {
-            $message .= " Pengeluaran pembelian supplier otomatis dibukukan di Buku Kas.";
-        }
 
         return back()->with('success', $message);
     }
@@ -101,38 +63,8 @@ class StockTransactionController extends Controller
 
         $this->transactionService->confirmTransaction($transaction, $user?->id);
 
-        $cashRecorded = false;
-        if ($transaction->type === 'in' && ($request->boolean('record_cash_flow') || str_contains($transaction->notes ?? '', '[Opsi Buku Kas Aktif]'))) {
-            $alreadyExists = CashTransaction::where('notes', 'like', "%Mutasi Stok #{$transaction->id}%")->exists();
-            if (! $alreadyExists && $transaction->product) {
-                $product = $transaction->product;
-                $unitPrice = (float) ($product->purchase_price ?: 0);
-                $totalAmount = $unitPrice * $transaction->quantity;
-                if ($totalAmount > 0) {
-                    $yearMonth = date('Ym');
-                    $countThisMonth = CashTransaction::where('transaction_number', 'like', "CSH-{$yearMonth}-%")->count();
-                    $trxNumber = sprintf("CSH-%s-SUP%03d", $yearMonth, $countThisMonth + 1);
-
-                    CashTransaction::create([
-                        'transaction_number' => $trxNumber,
-                        'type' => 'out',
-                        'category' => 'supplier',
-                        'amount' => $totalAmount,
-                        'date' => now()->toDateString(),
-                        'description' => "Pembelian Barang Masuk: {$product->name} ({$transaction->quantity} unit) dari " . ($product->supplier?->name ?? 'Supplier'),
-                        'notes' => "Harga Beli Satuan: Rp " . number_format($unitPrice, 0, ',', '.') . " | Terkait Mutasi Stok #{$transaction->id}",
-                        'user_id' => $user?->id ?? 1,
-                    ]);
-                    $cashRecorded = true;
-                }
-            }
-        }
-
         $typeText = $transaction->type === 'in' ? 'penerimaan barang masuk' : 'pengeluaran barang keluar';
         $msg = "Transaksi {$typeText} #{$transaction->id} berhasil dikonfirmasi dan disahkan oleh {$user->name}! Stok telah resmi diperbarui.";
-        if ($cashRecorded) {
-            $msg .= " Pengeluaran pembelian supplier otomatis dibukukan di Buku Kas.";
-        }
 
         return back()->with('success', $msg);
     }

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\CashTransaction;
 use App\Models\Setting;
 use App\Models\TeamInvitation;
 use App\Models\User;
@@ -148,37 +147,6 @@ class DashboardService
                 'created_at' => $note->created_at ? $note->created_at->format('d M Y, H:i') : '-',
             ]);
 
-        // Buku Kas / Arus Kas: Catatan Kas Masuk & Kas Keluar
-        $cashTransactions = CashTransaction::with(['user:id,name,role'])->latest('date')->latest('id')->get()->map(function ($c) {
-            return [
-                'id' => $c->id,
-                'transaction_number' => $c->transaction_number,
-                'type' => $c->type,
-                'category' => $c->category,
-                'amount' => (float) $c->amount,
-                'date' => $c->date ? $c->date->format('Y-m-d') : '',
-                'date_formatted' => $c->date ? $c->date->format('d M Y') : '-',
-                'description' => $c->description,
-                'proof_image' => $c->proof_image,
-                'notes' => $c->notes,
-                'user_name' => $c->user?->name ?? 'Sistem',
-                'created_at' => $c->created_at ? $c->created_at->format('d M Y, H:i') : '-',
-            ];
-        })->values();
-
-        $totalCashIn = $cashTransactions->where('type', 'in')->sum('amount');
-        $totalCashOut = $cashTransactions->where('type', 'out')->sum('amount');
-        $netCashBalance = $totalCashIn - $totalCashOut;
-
-        $today = now()->toDateString();
-        $thisMonth = now()->format('Y-m');
-
-        $todayCashIn = $cashTransactions->where('type', 'in')->where('date', $today)->sum('amount');
-        $todayCashOut = $cashTransactions->where('type', 'out')->where('date', $today)->sum('amount');
-
-        $monthCashIn = $cashTransactions->filter(fn ($c) => $c['type'] === 'in' && str_starts_with($c['date'], $thisMonth))->sum('amount');
-        $monthCashOut = $cashTransactions->filter(fn ($c) => $c['type'] === 'out' && str_starts_with($c['date'], $thisMonth))->sum('amount');
-
         // Notifikasi Cerdas & Interaktif sesuai Role untuk Navbar Lonceng
         $notificationItems = collect();
 
@@ -232,13 +200,6 @@ class DashboardService
                 'today_stock_in' => $todayStockIn,
                 'today_stock_out' => $todayStockOut,
                 'low_stock_count' => $lowStockItems->count(),
-                'total_cash_in' => $totalCashIn,
-                'total_cash_out' => $totalCashOut,
-                'net_cash_balance' => $netCashBalance,
-                'month_cash_in' => $monthCashIn,
-                'month_cash_out' => $monthCashOut,
-                'today_cash_in' => $todayCashIn,
-                'today_cash_out' => $todayCashOut,
             ],
             'chartData' => $chartData,
             'categories' => $categories,
@@ -247,7 +208,6 @@ class DashboardService
             'transactions' => $transactions,
             'users' => $users,
             'warehouseNotes' => $warehouseNotes,
-            'cashTransactions' => $cashTransactions,
             'staffMembers' => $staffMembers,
             'lowStockItems' => $lowStockItems,
             'pendingInTasks' => $pendingInTasks,

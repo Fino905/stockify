@@ -11,8 +11,7 @@ import {
     TrendingUp,
     Shield,
     Clock,
-    CheckCircle2,
-    Wallet
+    CheckCircle2
 } from 'lucide-react';
 
 export interface ManagerLowStockItem {
@@ -110,15 +109,6 @@ export function ManagerStockOverview({
                     >
                         <ClipboardCheck className="w-3.5 h-3.5 text-amber-300" />
                         Stock Opname
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => onSelectTab('cash_flow')}
-                        className="btn-press inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-950 bg-emerald-300 hover:bg-emerald-200 rounded-xl shadow-xs transition-colors cursor-pointer"
-                        title="Buka Buku Kas & Laporan Arus Kas Gudang"
-                    >
-                        <Wallet className="w-3.5 h-3.5 text-emerald-800" />
-                        Buku Kas
                     </button>
                 </div>
             </div>

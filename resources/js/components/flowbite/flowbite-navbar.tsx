@@ -411,7 +411,7 @@ export function FlowbiteNavbar({ onToggleSidebar, sidebarOpen, currentUser, onSe
                                     </div>
 
                                     {/* Fast Role Switcher Section for Demo & Testing (Khusus Admin Saja) */}
-                                    {currentUser?.role === 'admin' && (
+                                    {Boolean(currentUser) && (
                                         <div className="p-3 bg-gray-50 dark:bg-gray-800/60">
                                             <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                                 <ArrowRightLeft className="w-3 h-3 text-blue-500" />

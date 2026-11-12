@@ -42,7 +42,6 @@ Dibangun dengan arsitektur modern berbasis **Single Page Application (SPA)** men
 
 ### 👑 1. Portal Admin & Manajer Gudang
 - **Executive Analytics Dashboard**: Metrik perputaran stok (*turnover rate*), total nilai aset gudang, SKU hampir habis (*low-stock alerts*), dan tren mutasi barang.
-- **Cash Flow & Financial Tracking**: Rekap arus kas operasional gudang, modal awal, biaya packing/utilitas, dan pembayaran supplier.
 - **Supplier & Category Management**: Manajemen pemasok mitra dan master kategori produk.
 - **User & Access Control**: Manajemen akun internal pergudangan dengan penetapan hak akses terperinci.
 
@@ -149,7 +148,7 @@ stockify/
 ├── app/
 │   ├── Actions/Fortify/           # Aksi registrasi & autentikasi pengguna
 │   ├── Http/Controllers/          # Controller (Dashboard, User, Setting, QuickSwitch, dll.)
-│   ├── Models/                   # Model Eloquent (Product, Supplier, Category, StockTransaction, CashTransaction)
+│   ├── Models/                   # Model Eloquent (Product, Supplier, Category, StockTransaction, Setting, WarehouseNote)
 │   └── Services/                 # Business logic terisolasi (DashboardService, ProductService)
 ├── database/
 │   ├── migrations/               # Skema tabel database

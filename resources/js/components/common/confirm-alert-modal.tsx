@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-    AlertCircle, 
-    CheckCircle2, 
-    AlertTriangle, 
-    Package, 
-    Truck, 
-    Boxes, 
-    X, 
+import {
+    AlertCircle,
+    CheckCircle2,
+    AlertTriangle,
+    Package,
+    Truck,
+    Boxes,
+    X,
     RotateCcw,
     Info,
     Trash2
@@ -117,7 +117,7 @@ export function ConfirmAlertModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-            <div 
+            <div
                 className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-lg w-full border border-gray-100 dark:border-gray-700 overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col"
                 role="dialog"
                 aria-modal="true"
@@ -229,9 +229,8 @@ export function ConfirmAlertModal({
                                     )}
                                 </div>
                                 {itemDetails.badge && (
-                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border shrink-0 ${
-                                        itemDetails.badgeColor || variantStyles.badgeBg
-                                    }`}>
+                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border shrink-0 ${itemDetails.badgeColor || variantStyles.badgeBg
+                                        }`}>
                                         {itemDetails.badge}
                                     </span>
                                 )}
@@ -242,11 +241,10 @@ export function ConfirmAlertModal({
                                     {itemDetails.fields.map((field, idx) => (
                                         <div key={idx}>
                                             <span className="text-gray-500 block">{field.label}:</span>
-                                            <span className={`font-semibold ${
-                                                field.isHighlight 
-                                                    ? 'text-rose-600 dark:text-rose-400 font-bold' 
+                                            <span className={`font-semibold ${field.isHighlight
+                                                    ? 'text-rose-600 dark:text-rose-400 font-bold'
                                                     : 'text-gray-900 dark:text-white'
-                                            }`}>
+                                                }`}>
                                                 {field.value}
                                             </span>
                                         </div>

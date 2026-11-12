@@ -46,7 +46,7 @@ export default function Register({
         };
     };
 
-    const [appSettings, setAppSettings] = useState(() => {
+    const [appSettings, setAppSettings] = useState<Record<string, any>>(() => {
         const base = initialAppSettings || pageProps.appSettings || {
             appName: 'Stockify',
             warehouseName: 'Gudang Pusat Logistik Cikarang',
